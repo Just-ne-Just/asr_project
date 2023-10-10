@@ -11,14 +11,15 @@
     "log_spec": true
   },
   "augmentations": {
-    "wave": [],
-    "spectrogram": []
+    "wave": [
+    ],
+    "spectrogram": [
+    ]
   },
   "arch": {
-    "type": "BaselineModel",
+    "type": "DeepSpeech",
     "args": {
-      "n_feats": 128,
-      "fc_hidden": 512
+      "n_feats": 128
     }
   },
   "data": {
