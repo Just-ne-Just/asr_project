@@ -58,7 +58,6 @@ class LibrispeechDataset(BaseDataset):
                 index = json.load(f)
         else:
             index = self._create_index(part)
-            print("INDEX:", index)
             with index_path.open("w") as f:
                 json.dump(index, f, indent=2)
         return index
