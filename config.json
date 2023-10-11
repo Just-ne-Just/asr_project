@@ -24,7 +24,7 @@
         "args": {
           "background_paths": "/kaggle/input/keyword-spotting-full/noise_train/noise_train",
           "sample_rate": 16000,
-          "p": 1
+          "p": 0.8
         }
       },
       {

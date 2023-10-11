@@ -1,13 +1,17 @@
 import torchaudio.transforms as T
 from torch import Tensor
+import random
 
 from hw_asr.augmentations.base import AugmentationBase
 
 
 class FrequencyMasking(AugmentationBase):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, p=0.5, *args, **kwargs):
+        self.p = p
         self._aug = T.FrequencyMasking(*args, **kwargs)
 
     def __call__(self, data: Tensor):
-        x = data.unsqueeze(1)
-        return self._aug(x).squeeze(1)
+        if random.random() < self.p:
+            x = data.unsqueeze(1)
+            return self._aug(x).squeeze(1)
+        return data
