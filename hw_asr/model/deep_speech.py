@@ -23,7 +23,7 @@ class RNNBatchNorm(nn.Module):
         return x, h
 
 class DeepSpeech(BaseModel):
-    def __init__(self, n_feats, n_class, rnn_type='lstm', rnn_hidden=1024, bidirectional=True, num_conv_layers=2, num_rnn_layers=5, **batch):
+    def __init__(self, n_feats, n_class, rnn_type='gru', rnn_hidden=1024, bidirectional=True, num_conv_layers=2, num_rnn_layers=5, **batch):
         super().__init__(n_feats, n_class, **batch)
         assert 3 >= num_conv_layers > 0
         assert num_rnn_layers > 0
