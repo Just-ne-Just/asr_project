@@ -78,6 +78,7 @@ class LibrispeechDataset(BaseDataset):
                 list(flac_dirs), desc=f"Preparing librispeech folders: {part}"
         ):
             flac_dir = Path(flac_dir)
+            print(flac_dir.glob("*.trans.txt"))
             trans_path = list(flac_dir.glob("*.trans.txt"))[0]
             with trans_path.open() as f:
                 for line in f:
