@@ -79,7 +79,6 @@ class LibrispeechDataset(BaseDataset):
         ):
             txt_dir = Path('/'.join(flac_dir.split('/')[:-1] + ['meta'] + [flac_dir.split('/')[-1]]))
             flac_dir = Path(flac_dir)
-            print(flac_dir)
             trans_paths = list(txt_dir.glob("*.trans.txt"))
             for trans_path in trans_paths:
                 with trans_path.open() as f:
