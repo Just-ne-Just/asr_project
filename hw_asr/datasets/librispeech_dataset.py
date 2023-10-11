@@ -80,19 +80,20 @@ class LibrispeechDataset(BaseDataset):
             txt_dir = Path('/'.join(flac_dir.split('/')[:-1] + ['meta'] + [flac_dir.split('/')[-1]]))
             flac_dir = Path(flac_dir)
             print(flac_dir)
-            trans_path = list(txt_dir.glob("*.trans.txt"))[0]
-            with trans_path.open() as f:
-                for line in f:
-                    f_id = line.split()[0]
-                    f_text = " ".join(line.split()[1:]).strip()
-                    flac_path = flac_dir / f"{f_id}.wav"
-                    t_info = torchaudio.info(str(flac_path))
-                    length = t_info.num_frames / t_info.sample_rate
-                    index.append(
-                        {
-                            "path": str(flac_path.absolute().resolve()),
-                            "text": f_text.lower(),
-                            "audio_len": length,
-                        }
-                    )
+            trans_paths = list(txt_dir.glob("*.trans.txt"))
+            for trans_path in trans_paths:
+                with trans_path.open() as f:
+                    for line in f:
+                        f_id = line.split()[0]
+                        f_text = " ".join(line.split()[1:]).strip()
+                        flac_path = flac_dir / f"{f_id}.wav"
+                        t_info = torchaudio.info(str(flac_path))
+                        length = t_info.num_frames / t_info.sample_rate
+                        index.append(
+                            {
+                                "path": str(flac_path.absolute().resolve()),
+                                "text": f_text.lower(),
+                                "audio_len": length,
+                            }
+                        )
         return index
