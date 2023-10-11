@@ -6,12 +6,11 @@ from hw_asr.augmentations.base import AugmentationBase
 
 
 class FrequencyMasking(AugmentationBase):
-    def __init__(self, p=0.5, *args, **kwargs):
-        self.p = p
+    def __init__(self, *args, **kwargs):
         self._aug = T.FrequencyMasking(*args, **kwargs)
 
     def __call__(self, data: Tensor):
-        if random.random() < self.p:
+        if random.random() < 0.5:
             x = data.unsqueeze(1)
             return self._aug(x).squeeze(1)
         return data
