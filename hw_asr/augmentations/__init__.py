@@ -1,7 +1,7 @@
 try:
     from collections import Callable
 except Exception as e:
-    from abc import Callable
+    from collections.abc import Callable
 from typing import List
 
 import hw_asr.augmentations.spectrogram_augmentations
