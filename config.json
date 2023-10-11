@@ -54,7 +54,8 @@
   "arch": {
     "type": "DeepSpeech",
     "args": {
-      "n_feats": 128
+      "n_feats": 128,
+      "rnn_hidden": 256
     }
   },
   "data": {
@@ -135,7 +136,7 @@
     }
   },
   "trainer": {
-    "epochs": 100,
+    "epochs": 50,
     "save_dir": "saved/",
     "save_period": 5,
     "verbosity": 2,
