@@ -73,7 +73,7 @@ class LibrispeechDataset(BaseDataset):
         flac_dirs = set()
         for dirpath, dirnames, filenames in os.walk(str(split_dir)):
             print(dirpath, dirnames, filenames)
-            if any([f.endswith(".flac") for f in filenames]):
+            if any([f.endswith(".wav") for f in filenames]):
                 flac_dirs.add(dirpath)
         for flac_dir in tqdm(
                 list(flac_dirs), desc=f"Preparing librispeech folders: {part}"
