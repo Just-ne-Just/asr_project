@@ -12,50 +12,16 @@
   },
   "augmentations": {
     "wave": [
-      {
-        "type": "Gain",
-        "args": {
-          "sample_rate": 16000,
-          "p": 0.25
-        }
-      },
-      {
-        "type": "AddBackgroundNoise",
-        "args": {
-          "background_paths": "/kaggle/input/keyword-spotting-full/noise_train/noise_train",
-          "sample_rate": 16000,
-          "p": 0.8
-        }
-      },
-      {
-        "type": "PitchShift",
-        "args": {
-          "sample_rate": 16000,
-          "p": 0.25
-        }
-      }
     ],
     "spectrogram": [
-      {
-        "type": "FrequencyMasking",
-        "args": {
-          "freq_mask_param": 20
-        }
-      },
-      {
-        "type": "TimeMasking",
-        "args": {
-
-          "time_mask_param": 80
-        }
-      }
     ]
   },
   "arch": {
     "type": "DeepSpeech",
     "args": {
       "n_feats": 128,
-      "rnn_hidden": 256
+      "rnn_hidden": 256,
+      "num_rnn_layers": 3
     }
   },
   "data": {
