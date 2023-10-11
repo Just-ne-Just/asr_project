@@ -33,6 +33,7 @@ class BaseDataset(Dataset):
         self.log_spec = config_parser["preprocessing"]["log_spec"]
 
         self._assert_index_is_valid(index)
+        print("LEN INDEX:", len(index))
         index = self._filter_records_from_dataset(index, max_audio_length, max_text_length, limit)
         # it's a good idea to sort index by audio length
         # It would be easier to write length-based batch samplers later
