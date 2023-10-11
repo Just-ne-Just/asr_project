@@ -34,7 +34,9 @@ class BaseDataset(Dataset):
 
         self._assert_index_is_valid(index)
         print("LEN INDEX:", len(index))
+        print("INDEX ELEM:", index[0])
         index = self._filter_records_from_dataset(index, max_audio_length, max_text_length, limit)
+        print("LEN INDEX AFTER FILTER:", len(index))
         # it's a good idea to sort index by audio length
         # It would be easier to write length-based batch samplers later
         index = self._sort_index(index)
