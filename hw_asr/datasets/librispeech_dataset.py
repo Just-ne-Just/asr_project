@@ -77,7 +77,7 @@ class LibrispeechDataset(BaseDataset):
         for flac_dir in tqdm(
                 list(flac_dirs), desc=f"Preparing librispeech folders: {part}"
         ):
-            txt_dir = '/'.join(flac_dir.split('/')[:-1] + ['meta'] + flac_dir.split('/')[-1])
+            txt_dir = '/'.join(flac_dir.split('/')[:-1] + ['meta'] + [flac_dir.split('/')[-1]])
             flac_dir = Path(flac_dir)
             print(flac_dir)
             trans_path = list(txt_dir.glob("*.trans.txt"))[0]
