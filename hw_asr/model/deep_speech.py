@@ -62,7 +62,7 @@ class DeepSpeech(BaseModel):
         rnn_type = rnn_types[rnn_type]
         self.rnn_input_size = n_feats
         self.rnn_input_size = (self.rnn_input_size + 2 * 20 - 41) // 2 + 1
-        self.rnn_input_size = (self.rnn_input_size + 2 * 10 - 21) // 2 + 1 if num_conv_layers == 2 else self.rnn_input_size
+        self.rnn_input_size = (self.rnn_input_size + 2 * 10 - 21) // 2 + 1 if num_conv_layers >= 2 else self.rnn_input_size
         self.rnn_input_size = (self.rnn_input_size + 2 * 10 - 21) // 2 + 1 if num_conv_layers == 3 else self.rnn_input_size
         self.rnn_input_size *= (96 if num_conv_layers == 3 else 32)
         
@@ -103,7 +103,7 @@ class DeepSpeech(BaseModel):
         max_len = input_lengths.max()
 
         input_lengths = (max_len + 2 * 5 - 11) // 2 + 1
-        input_lengths = (max_len + 2 * 5 - 11) // 2 + 1 if self.num_conv_layers == 2 else input_lengths
+        input_lengths = (max_len + 2 * 5 - 11) // 2 + 1 if self.num_conv_layers >= 2 else input_lengths
         input_lengths = (max_len + 2 * 5 - 11) + 1 if self.num_conv_layers == 3 else input_lengths
         
         return torch.zeros_like(input_lengths).fill_(max_len)
