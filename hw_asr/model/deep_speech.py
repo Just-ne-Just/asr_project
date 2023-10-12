@@ -13,7 +13,7 @@ class RNNBatchNorm(nn.Module):
     def __init__(self, input_size, hidden_size, bidirectional, rnn_type, use_norm=False, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.rnn = rnn_type(input_size=input_size, hidden_size=hidden_size, bidirectional=bidirectional, batch_first=True)
-        self.batch_norm = nn.BatchNorm2d(num_features=1)
+        self.batch_norm = nn.BatchNorm1d(hidden_size)
     
     def forward(self, args):
         x = args[0]
@@ -22,8 +22,12 @@ class RNNBatchNorm(nn.Module):
         x = x.view(x.size(0), x.size(1), 2, -1)
         x = x.sum(2)
         x = x.view(x.size(0), x.size(1), -1)
-        x = self.batch_norm(x.unsqueeze(0).transpose(0, 1))
-        return x.squeeze(1), h
+
+        dim1, dim2 = x.size(0), x.size(1)
+        x = x.view(dim1 * dim2, -1)
+        x = self.batch_norm(x)
+        x = x.view(dim1, dim2, -1)
+        return x, h
 
 class DeepSpeech(BaseModel):
     def __init__(self, n_feats, n_class, rnn_type='gru', rnn_hidden=1024, bidirectional=True, num_conv_layers=2, num_rnn_layers=5, **batch):
@@ -36,22 +40,22 @@ class DeepSpeech(BaseModel):
         self.conv_layers = nn.Sequential()
         conv1 = nn.Sequential(
             nn.Conv2d(padding=(20, 5), kernel_size=(41, 11), in_channels=1, out_channels=32, stride=(2, 2)),
-            nn.Hardtanh(0, 20, inplace=True),
-            nn.BatchNorm2d(num_features=32)
+            nn.BatchNorm2d(num_features=32),
+            nn.Hardtanh(0, 20, inplace=True)
         )
         self.conv_layers.add_module("conv1", conv1)
         if num_conv_layers == 2:
             conv2 = nn.Sequential(
                 nn.Conv2d(padding=(10, 5), kernel_size=(21, 11), in_channels=32, out_channels=32, stride=(2, 1)),
-                nn.Hardtanh(0, 20, inplace=True),
                 nn.BatchNorm2d(num_features=32),
+                nn.Hardtanh(0, 20, inplace=True),
             )
             self.conv_layers.add_module("conv2", conv2)
         if num_conv_layers == 3:
             conv3 = nn.Sequential(
                 nn.Conv2d(padding=(10, 5), kernel_size=(21, 11), in_channels=32, out_channels=96, stride=(2, 1)),
+                nn.BatchNorm2d(num_features=32),
                 nn.Hardtanh(0, 20, inplace=True),
-                nn.BatchNorm2d(num_features=96),
             )
             self.conv_layers.add_module("conv3", conv3)
         
@@ -84,6 +88,8 @@ class DeepSpeech(BaseModel):
         self.look_ahead = nn.Identity()
         self.fc = nn.Linear(in_features=rnn_hidden, out_features=n_class)
 
+    def _conv_with_mask(self, spectrogram, lengths):
+        pass
 
     def forward(self, spectrogram, **batch):
         x = self.conv_layers(spectrogram.unsqueeze(1).transpose(2, 3))
