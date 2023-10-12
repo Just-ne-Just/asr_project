@@ -13,14 +13,17 @@ class RNNBatchNorm(nn.Module):
     def __init__(self, input_size, hidden_size, bidirectional, rnn_type, use_norm=False, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.rnn = rnn_type(input_size=input_size, hidden_size=hidden_size, bidirectional=bidirectional, batch_first=True)
-        self.layer_norm = nn.LayerNorm(2 * hidden_size) if use_norm else nn.Identity()
+        self.batch_norm = nn.BatchNorm2d(num_features=1)
     
     def forward(self, args):
         x = args[0]
         h = args[1]
-        x = self.layer_norm(x)
         x, h = self.rnn(x, h)
-        return x, h
+        x = x.view(x.size(0), x.size(1), 2, -1)
+        x = x.sum(2)
+        x = x.view(x.size(0), x.size(1), -1)
+        x = self.batch_norm(x.unsqueeze(0).transpose(0, 1))
+        return x.squeeze(1), h
 
 class DeepSpeech(BaseModel):
     def __init__(self, n_feats, n_class, rnn_type='gru', rnn_hidden=1024, bidirectional=True, num_conv_layers=2, num_rnn_layers=5, **batch):
@@ -70,7 +73,7 @@ class DeepSpeech(BaseModel):
                 self.all_rnn.add_module(f"rnn_0", rnn_0)
             else:
                 rnn_i = nn.Sequential(
-                    RNNBatchNorm(input_size=rnn_hidden * 2, hidden_size=rnn_hidden, rnn_type=rnn_type, bidirectional=bidirectional, use_norm=True),
+                    RNNBatchNorm(input_size=rnn_hidden, hidden_size=rnn_hidden, rnn_type=rnn_type, bidirectional=bidirectional, use_norm=True),
                 )
                 self.all_rnn.add_module(f"rnn_{i}", rnn_i)
         
@@ -79,7 +82,7 @@ class DeepSpeech(BaseModel):
 
         #     )
         self.look_ahead = nn.Identity()
-        self.fc = nn.Linear(in_features=rnn_hidden * 2, out_features=n_class)
+        self.fc = nn.Linear(in_features=rnn_hidden, out_features=n_class)
 
 
     def forward(self, spectrogram, **batch):
@@ -94,5 +97,4 @@ class DeepSpeech(BaseModel):
         input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 2 + 1).int()
         input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 1 + 1).int() if self.num_conv_layers == 2 else input_lengths
         input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 1 + 1).int() if self.num_conv_layers == 3 else input_lengths
-        print(input_lengths)
         return input_lengths
