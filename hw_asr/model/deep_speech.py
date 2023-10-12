@@ -92,7 +92,7 @@ class DeepSpeech(BaseModel):
         pass
 
     def forward(self, spectrogram, **batch):
-        x = self.conv_layers(spectrogram.unsqueeze(1).transpose(2, 3))
+        x = self.conv_layers(spectrogram.unsqueeze(1))
         x = x.view(x.shape[0], -1, self.rnn_input_size)
         x, _ = self.all_rnn((x, None))
         x = self.look_ahead(x)
