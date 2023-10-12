@@ -28,6 +28,7 @@ class DeepSpeech(BaseModel):
         assert 3 >= num_conv_layers > 0
         assert num_rnn_layers > 0
         assert rnn_type in rnn_types
+        self.num_conv_layers = num_conv_layers
         self.bidirectional = bidirectional
         self.conv_layers = nn.Sequential()
         conv1 = nn.Sequential(
@@ -90,4 +91,8 @@ class DeepSpeech(BaseModel):
         return {"logits": x}
 
     def transform_input_lengths(self, input_lengths):
-        return (input_lengths / 2).int()
+        input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 2 + 1).int()
+        input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 1 + 1).int() if self.num_conv_layers == 2 else input_lengths
+        input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 1 + 1).int() if self.num_conv_layers == 3 else input_lengths
+        print(input_lengths)
+        return input_lengths
