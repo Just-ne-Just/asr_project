@@ -33,16 +33,7 @@
           "args": {
             "part": "train-clean-100",
             "max_audio_length": 20.0,
-            "max_text_length": 250,
-            "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
-          }
-        },
-        {
-          "type": "LibrispeechDataset",
-          "args": {
-            "part": "train-clean-360",
-            "max_audio_length": 20.0,
-            "max_text_length": 250,
+            "max_text_length": 200,
             "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
           }
         }
@@ -100,10 +91,13 @@
     }
   ],
   "lr_scheduler": {
-    "type": "StepLR",
+    "type": "OneCycleLR",
     "args": {
-      "step_size": 2500,
-      "gamma": 0.5
+      "steps_per_epoch": 336,
+      "epochs": 50,
+      "anneal_strategy": "cos",
+      "max_lr": 3e-4,
+      "pct_start": 0.2
     }
   },
   "trainer": {
@@ -116,7 +110,6 @@
     "visualize": "wandb",
     "wandb_project": "asr_project",
     "len_epoch": 336,
-    "grad_norm_clip": 10,
-    "batch_accum_steps": 3
+    "grad_norm_clip": 10
   }
 }
