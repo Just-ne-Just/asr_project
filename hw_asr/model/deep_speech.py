@@ -100,6 +100,7 @@ class DeepSpeech(BaseModel):
         return {"logits": x}
 
     def transform_input_lengths(self, input_lengths):
+        print(input_lengths)
         input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 2 + 1).int()
         input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 2 + 1).int() if self.num_conv_layers == 2 else input_lengths
         input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 1 + 1).int() if self.num_conv_layers == 3 else input_lengths
