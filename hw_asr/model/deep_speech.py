@@ -44,7 +44,7 @@ class DeepSpeech(BaseModel):
             nn.ReLU()
         )
         self.conv_layers.add_module("conv1", conv1)
-        if num_conv_layers == 2:
+        if num_conv_layers >= 2:
             conv2 = nn.Sequential(
                 nn.Conv2d(padding=(10, 5), kernel_size=(21, 11), in_channels=32, out_channels=32, stride=(2, 2)),
                 nn.BatchNorm2d(num_features=32),
