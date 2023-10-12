@@ -54,7 +54,7 @@ class DeepSpeech(BaseModel):
         if num_conv_layers == 3:
             conv3 = nn.Sequential(
                 nn.Conv2d(padding=(10, 5), kernel_size=(21, 11), in_channels=32, out_channels=96, stride=(2, 1)),
-                nn.BatchNorm2d(num_features=32),
+                nn.BatchNorm2d(num_features=96),
                 nn.Hardtanh(0, 20, inplace=True),
             )
             self.conv_layers.add_module("conv3", conv3)
