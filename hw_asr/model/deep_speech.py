@@ -30,7 +30,7 @@ class RNNBatchNorm(nn.Module):
         return x, h
 
 class DeepSpeech(BaseModel):
-    def __init__(self, n_feats, n_class, rnn_type='gru', rnn_hidden=1024, bidirectional=True, num_conv_layers=2, num_rnn_layers=5, **batch):
+    def __init__(self, n_feats, n_class, rnn_type='gru', rnn_hidden=1024, bidirectional=True, num_conv_layers=3, num_rnn_layers=5, **batch):
         super().__init__(n_feats, n_class, **batch)
         assert 3 >= num_conv_layers > 0
         assert num_rnn_layers > 0
@@ -46,7 +46,7 @@ class DeepSpeech(BaseModel):
         self.conv_layers.add_module("conv1", conv1)
         if num_conv_layers == 2:
             conv2 = nn.Sequential(
-                nn.Conv2d(padding=(10, 5), kernel_size=(21, 11), in_channels=32, out_channels=32, stride=(2, 1)),
+                nn.Conv2d(padding=(10, 5), kernel_size=(21, 11), in_channels=32, out_channels=32, stride=(2, 2)),
                 nn.BatchNorm2d(num_features=32),
                 nn.Hardtanh(0, 20, inplace=True),
             )
@@ -101,6 +101,6 @@ class DeepSpeech(BaseModel):
 
     def transform_input_lengths(self, input_lengths):
         input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 2 + 1).int()
-        input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 1 + 1).int() if self.num_conv_layers == 2 else input_lengths
+        input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 2 + 1).int() if self.num_conv_layers == 2 else input_lengths
         input_lengths = (torch.floor(input_lengths + 2 * 5 - 11) / 1 + 1).int() if self.num_conv_layers == 3 else input_lengths
         return input_lengths
