@@ -19,7 +19,7 @@
   "arch": {
     "type": "DeepSpeech",
     "args": {
-      "n_feats": 512,
+      "n_feats": 128,
       "rnn_hidden": 256
     }
   },
