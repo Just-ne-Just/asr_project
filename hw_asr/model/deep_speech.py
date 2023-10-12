@@ -41,21 +41,21 @@ class DeepSpeech(BaseModel):
         conv1 = nn.Sequential(
             nn.Conv2d(padding=(20, 5), kernel_size=(41, 11), in_channels=1, out_channels=32, stride=(2, 2)),
             nn.BatchNorm2d(num_features=32),
-            nn.Hardtanh(0, 20, inplace=True)
+            nn.ReLU()
         )
         self.conv_layers.add_module("conv1", conv1)
         if num_conv_layers == 2:
             conv2 = nn.Sequential(
                 nn.Conv2d(padding=(10, 5), kernel_size=(21, 11), in_channels=32, out_channels=32, stride=(2, 2)),
                 nn.BatchNorm2d(num_features=32),
-                nn.Hardtanh(0, 20, inplace=True),
+                nn.ReLU(),
             )
             self.conv_layers.add_module("conv2", conv2)
         if num_conv_layers == 3:
             conv3 = nn.Sequential(
                 nn.Conv2d(padding=(10, 5), kernel_size=(21, 11), in_channels=32, out_channels=96, stride=(2, 1)),
                 nn.BatchNorm2d(num_features=96),
-                nn.Hardtanh(0, 20, inplace=True),
+                nn.ReLU()
             )
             self.conv_layers.add_module("conv3", conv3)
         
@@ -93,8 +93,10 @@ class DeepSpeech(BaseModel):
 
     def forward(self, spectrogram, **batch):
         x = self.conv_layers(spectrogram.unsqueeze(1))
-        x = x.view(x.shape[0], -1, self.rnn_input_size)
-        x, _ = self.all_rnn((x, None))
+        print(x.shape)
+        x = x.view(x.shape[0], x.shape[1] * x.shape[2], x.shape[3])
+        print(x.shape)
+        x, _ = self.all_rnn((x.transpose(1, 2), None))
         x = self.look_ahead(x)
         x = self.fc(x)
         return {"logits": x}
