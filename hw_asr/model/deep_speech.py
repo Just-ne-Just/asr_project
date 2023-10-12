@@ -102,8 +102,8 @@ class DeepSpeech(BaseModel):
     def transform_input_lengths(self, input_lengths):
         max_len = input_lengths.max()
 
-        input_lengths = (max_len + 2 * 5 - 11) // 2 + 1
-        input_lengths = (max_len + 2 * 5 - 11) // 2 + 1 if self.num_conv_layers >= 2 else input_lengths
-        input_lengths = (max_len + 2 * 5 - 11) + 1 if self.num_conv_layers == 3 else input_lengths
+        max_len = (max_len + 2 * 5 - 11) // 2 + 1
+        max_len = (max_len + 2 * 5 - 11) // 2 + 1 if self.num_conv_layers >= 2 else input_lengths
+        max_len = (max_len + 2 * 5 - 11) + 1 if self.num_conv_layers == 3 else input_lengths
         
         return torch.zeros_like(input_lengths).fill_(max_len)
