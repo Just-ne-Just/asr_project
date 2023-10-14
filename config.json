@@ -25,7 +25,7 @@
   },
   "data": {
     "train": {
-      "batch_size": 64,
+      "batch_size": 16,
       "num_workers": 0,
       "datasets": [
         {
@@ -36,11 +36,20 @@
             "max_text_length": 200,
             "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
           }
+        },
+        {
+          "type": "LibrispeechDataset",
+          "args": {
+            "part": "train-clean-360",
+            "max_audio_length": 20.0,
+            "max_text_length": 200,
+            "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
+          }
         }
       ]
     },
     "val": {
-      "batch_size": 64,
+      "batch_size": 16,
       "num_workers": 0,
       "datasets": [
         {
@@ -53,7 +62,7 @@
       ]
     },
     "test-clean": {
-      "batch_size": 64,
+      "batch_size": 16,
       "num_workers": 0,
       "datasets": [
         {
@@ -109,7 +118,7 @@
     "early_stop": 100,
     "visualize": "wandb",
     "wandb_project": "asr_project",
-    "len_epoch": 336,
+    "len_epoch": 2000,
     "grad_norm_clip": 10
   }
 }
