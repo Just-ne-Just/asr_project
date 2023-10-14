@@ -96,7 +96,7 @@ class DeepSpeech(BaseModel):
         print(x.shape)
         x = x.view(x.shape[0], x.shape[1] * x.shape[2], x.shape[3])
         print(x.shape)
-        x, _ = self.all_rnn((x.transpose(1, 2), None))
+        x, _ = self.all_rnn((x.transpose(1, 2).contiguous(), None))
         x = self.look_ahead(x)
         x = self.fc(x)
         return {"logits": x}
