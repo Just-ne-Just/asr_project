@@ -1,0 +1,121 @@
+{
+    "name": "default_config",
+    "n_gpu": 1,
+    "preprocessing": {
+        "sr": 16000,
+        "spectrogram": {
+            "type": "MelSpectrogram",
+            "args": {}
+        },
+        "log_spec": true
+    },
+    "augmentations": {
+        "wave": [],
+        "spectrogram": []
+    },
+    "arch": {
+        "type": "DeepSpeech",
+        "args": {
+            "n_feats": 128,
+            "rnn_hidden": 256
+        }
+    },
+    "data": {
+        "train": {
+            "batch_size": 16,
+            "num_workers": 0,
+            "datasets": [
+                {
+                    "type": "LibrispeechDataset",
+                    "args": {
+                        "part": "train-clean-100",
+                        "max_audio_length": 20.0,
+                        "max_text_length": 200,
+                        "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
+                    }
+                },
+                {
+                    "type": "LibrispeechDataset",
+                    "args": {
+                        "part": "train-clean-360",
+                        "max_audio_length": 20.0,
+                        "max_text_length": 200,
+                        "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
+                    }
+                }
+            ]
+        },
+        "val": {
+            "batch_size": 16,
+            "num_workers": 0,
+            "datasets": [
+                {
+                    "type": "LibrispeechDataset",
+                    "args": {
+                        "part": "dev-clean",
+                        "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
+                    }
+                }
+            ]
+        },
+        "test-clean": {
+            "batch_size": 16,
+            "num_workers": 0,
+            "datasets": [
+                {
+                    "type": "LibrispeechDataset",
+                    "args": {
+                        "part": "test-clean",
+                        "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
+                    }
+                }
+            ]
+        }
+    },
+    "optimizer": {
+        "type": "Adam",
+        "args": {
+            "lr": 0.0003
+        }
+    },
+    "loss": {
+        "type": "CTCLoss",
+        "args": {}
+    },
+    "metrics": [
+        {
+            "type": "ArgmaxWERMetric",
+            "args": {
+                "name": "WER (argmax)"
+            }
+        },
+        {
+            "type": "ArgmaxCERMetric",
+            "args": {
+                "name": "CER (argmax)"
+            }
+        }
+    ],
+    "lr_scheduler": {
+        "type": "OneCycleLR",
+        "args": {
+            "steps_per_epoch": 2000,
+            "epochs": 50,
+            "anneal_strategy": "cos",
+            "max_lr": 0.0003,
+            "pct_start": 0.2
+        }
+    },
+    "trainer": {
+        "epochs": 50,
+        "save_dir": "saved/",
+        "save_period": 5,
+        "verbosity": 2,
+        "monitor": "min val_loss",
+        "early_stop": 100,
+        "visualize": "wandb",
+        "wandb_project": "asr_project",
+        "len_epoch": 2000,
+        "grad_norm_clip": 10
+    }
+}
