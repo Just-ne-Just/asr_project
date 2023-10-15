@@ -12,7 +12,7 @@ class BaseTrainer:
     Base class for all trainers
     """
 
-    def __init__(self, model: BaseModel, criterion, metrics, optimizer, config, device):
+    def __init__(self, model: BaseModel, criterion, metrics, optimizer, config, device, lr_scheduler):
         self.device = device
         self.config = config
         self.logger = config.get_logger("trainer", config["trainer"]["verbosity"])
@@ -21,6 +21,7 @@ class BaseTrainer:
         self.criterion = criterion
         self.metrics = metrics
         self.optimizer = optimizer
+        self.lr_scheduler = lr_scheduler
 
         # for interrupt saving
         self._last_epoch = 0
@@ -144,6 +145,7 @@ class BaseTrainer:
             "optimizer": self.optimizer.state_dict(),
             "monitor_best": self.mnt_best,
             "config": self.config,
+            "scheduler": self.lr_scheduler.state_dict() if self.lr_scheduler is not None else ""
         }
         filename = str(self.checkpoint_dir / "checkpoint-epoch{}.pth".format(epoch))
         if not (only_best and save_best):
@@ -185,6 +187,7 @@ class BaseTrainer:
             )
         else:
             self.optimizer.load_state_dict(checkpoint["optimizer"])
+            self.lr_scheduler.load_state_dict(checkpoint["lr_scheduler"])
 
         self.logger.info(
             "Checkpoint loaded. Resume training from epoch {}".format(self.start_epoch)

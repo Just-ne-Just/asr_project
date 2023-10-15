@@ -36,7 +36,7 @@ class Trainer(BaseTrainer):
             len_epoch=None,
             skip_oom=True,
     ):
-        super().__init__(model, criterion, metrics, optimizer, config, device)
+        super().__init__(model, criterion, metrics, optimizer, config, device, lr_scheduler)
         self.skip_oom = skip_oom
         self.text_encoder = text_encoder
         self.config = config
@@ -49,7 +49,6 @@ class Trainer(BaseTrainer):
             self.train_dataloader = inf_loop(self.train_dataloader)
             self.len_epoch = len_epoch
         self.evaluation_dataloaders = {k: v for k, v in dataloaders.items() if k != "train"}
-        self.lr_scheduler = lr_scheduler
         self.log_step = 50
 
         self.train_metrics = MetricTracker(
