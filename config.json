@@ -20,12 +20,12 @@
     "type": "DeepSpeech",
     "args": {
       "n_feats": 128,
-      "rnn_hidden": 256
+      "rnn_hidden": 512
     }
   },
   "data": {
     "train": {
-      "batch_size": 16,
+      "batch_size": 32,
       "num_workers": 0,
       "datasets": [
         {
@@ -49,7 +49,7 @@
       ]
     },
     "val": {
-      "batch_size": 16,
+      "batch_size": 32,
       "num_workers": 0,
       "datasets": [
         {
@@ -62,13 +62,26 @@
       ]
     },
     "test-clean": {
-      "batch_size": 16,
+      "batch_size": 32,
       "num_workers": 0,
       "datasets": [
         {
           "type": "LibrispeechDataset",
           "args": {
             "part": "test-clean",
+            "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
+          }
+        }
+      ]
+    },
+    "test-other": {
+      "batch_size": 32,
+      "num_workers": 0,
+      "datasets": [
+        {
+          "type": "LibrispeechDataset",
+          "args": {
+            "part": "test-other",
             "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
           }
         }
