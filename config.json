@@ -118,7 +118,7 @@
     "early_stop": 100,
     "visualize": "wandb",
     "wandb_project": "asr_project",
-    "len_epoch": 2000,
+    "len_epoch": 1000,
     "grad_norm_clip": 10
   }
 }
