@@ -20,7 +20,7 @@
         }
       },
       {
-        "type": "BackgroundNoise",
+        "type": "AddBackgroundNoise",
         "args": {
           "background_paths": "/kaggle/input/keyword-spotting-full/noise_train/noise_train",
           "sample_rate": 16000,
@@ -44,7 +44,7 @@
     ],
     "spectrogram": [
       {
-        "type": "RandomFrequencyMasking",
+        "type": "FrequencyMasking",
         "args": {
           "freq_mask_param": 20,
           "p": 0.1
