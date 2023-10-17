@@ -12,8 +12,51 @@
   },
   "augmentations": {
     "wave": [
+      {
+        "type": "Gain",
+        "args": {
+          "sample_rate": 16000,
+          "p": 0.1
+        }
+      },
+      {
+        "type": "BackgroundNoise",
+        "args": {
+          "background_paths": "/kaggle/input/keyword-spotting-full/noise_train/noise_train",
+          "sample_rate": 16000,
+          "p": 0.1
+        }
+      },
+      {
+        "type": "PitchShift",
+        "args": {
+          "sample_rate": 16000,
+          "p": 0.1
+        }
+      },
+      {
+        "type": "AddColoredNoise",
+        "args": {
+          "sample_rate": 16000,
+          "p": 0.1
+        }
+      }
     ],
     "spectrogram": [
+      {
+        "type": "RandomFrequencyMasking",
+        "args": {
+          "freq_mask_param": 20,
+          "p": 0.1
+        }
+      },
+      {
+        "type": "TimeMasking",
+        "args": {
+          "time_mask_param": 80,
+          "p": 0.1
+        }
+      }
     ]
   },
   "arch": {
@@ -25,7 +68,7 @@
   },
   "data": {
     "train": {
-      "batch_size": 32,
+      "batch_size": 64,
       "num_workers": 0,
       "datasets": [
         {
@@ -49,7 +92,7 @@
       ]
     },
     "val": {
-      "batch_size": 32,
+      "batch_size": 64,
       "num_workers": 0,
       "datasets": [
         {
@@ -62,7 +105,7 @@
       ]
     },
     "test-clean": {
-      "batch_size": 32,
+      "batch_size": 64,
       "num_workers": 0,
       "datasets": [
         {
@@ -102,7 +145,7 @@
   "lr_scheduler": {
     "type": "OneCycleLR",
     "args": {
-      "steps_per_epoch": 2000,
+      "steps_per_epoch": 1000,
       "epochs": 50,
       "anneal_strategy": "cos",
       "max_lr": 3e-4,
