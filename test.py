@@ -11,6 +11,7 @@ from hw_asr.trainer import Trainer
 from hw_asr.utils import ROOT_PATH
 from hw_asr.utils.object_loading import get_dataloaders
 from hw_asr.utils.parse_config import ConfigParser
+from hw_asr.metric.utils import calc_cer, calc_wer
 
 DEFAULT_CHECKPOINT_PATH = ROOT_PATH / "default_test_model" / "checkpoint.pth"
 
@@ -46,6 +47,8 @@ def main(config, out_file):
     results = []
 
     with torch.no_grad():
+        all_lm_wer = []
+        all_lm_cer = []
         for batch_num, batch in enumerate(tqdm(dataloaders["test"])):
             batch = Trainer.move_batch_to_device(batch, device)
             output = model(**batch)
@@ -60,21 +63,28 @@ def main(config, out_file):
             )
             batch["probs"] = batch["log_probs"].exp().cpu()
             batch["argmax"] = batch["probs"].argmax(-1)
+            all_hypos = text_encoder.ctc_lm(batch["probs"], batch["log_probs_length"], beam_size=3)
             for i in range(len(batch["text"])):
+                lm_wer = calc_wer(batch["text"][i], all_hypos[i]) * 100
+                all_lm_wer.append(lm_wer)
+                lm_cer = calc_cer(batch["text"][i], all_hypos[i]) * 100
+                all_lm_cer.append(lm_cer)
                 argmax = batch["argmax"][i]
                 argmax = argmax[: int(batch["log_probs_length"][i])]
                 results.append(
                     {
                         "ground_trurh": batch["text"][i],
                         "pred_text_argmax": text_encoder.ctc_decode(argmax.cpu().numpy()),
-                        "pred_text_beam_search": text_encoder.ctc_beam_search(
-                            batch["probs"][i], batch["log_probs_length"][i], beam_size=3
-                        )[:2],
-                        "pred_lm": text_encoder.ctc_lm(
-                            batch["probs"][i:i+1, :, :], batch["log_probs_length"][i:i+1], beam_size=3
-                        )[:2],
+                        # "pred_text_beam_search": text_encoder.ctc_beam_search(
+                        #     batch["probs"][i], batch["log_probs_length"][i], beam_size=3
+                        # )[:2],
+                        # "pred_lm": text_encoder.ctc_lm(
+                        #     batch["probs"], batch["log_probs_length"], beam_size=3
+                        # ),
                     }
                 )
+        print(f"LM WER: {sum(all_lm_wer) / len(all_lm_wer)}")
+        print(f"LM CER: {sum(all_lm_cer) / len(all_lm_cer)}")
             
     with Path(out_file).open("w") as f:
         json.dump(results, f, indent=2)
