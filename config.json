@@ -132,7 +132,7 @@
           "type": "LibrispeechDataset",
           "args": {
             "part": "test-other",
-            "data_dir": "/kaggle/input/librispeech/test-other/LibriSpeech/test-other"
+            "data_dir": "/kaggle/input/librispeech/test-other/LibriSpeech"
           }
         }
       ]
