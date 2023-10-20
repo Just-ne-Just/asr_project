@@ -111,7 +111,7 @@
         }
       ]
     },
-    "test": {
+    "test-clean": {
       "batch_size": 32,
       "num_workers": 0,
       "datasets": [
@@ -120,6 +120,19 @@
           "args": {
             "part": "test-clean",
             "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
+          }
+        }
+      ]
+    },
+    "test": {
+      "batch_size": 32,
+      "num_workers": 0,
+      "datasets": [
+        {
+          "type": "LibrispeechDataset",
+          "args": {
+            "part": "test-other",
+            "data_dir": "/kaggle/input/librispeech/test-other/LibriSpeech/test-other"
           }
         }
       ]
