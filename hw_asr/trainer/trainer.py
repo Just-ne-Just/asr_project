@@ -219,13 +219,22 @@ class Trainer(BaseTrainer):
         ]
         argmax_texts_raw = [self.text_encoder.decode(inds) for inds in argmax_inds]
         argmax_texts = [self.text_encoder.ctc_decode(inds) for inds in argmax_inds]
-        tuples = list(zip(argmax_texts, text, argmax_texts_raw, audio_path))
+
+        predictions = log_probs.detach().cpu().numpy()
+        lengths = log_probs_length.detach().numpy()
+
+        all_hypos = self.text_encoder.ctc_lm(predictions, lengths, 3)
+
+        tuples = list(zip(all_hypos, argmax_texts, text, argmax_texts_raw, audio_path))
         shuffle(tuples)
         rows = {}
-        for pred, target, raw_pred, audio_path in tuples[:examples_to_log]:
+        for lm_pred, pred, target, raw_pred, audio_path in tuples[:examples_to_log]:
             target = BaseTextEncoder.normalize_text(target)
             wer = calc_wer(target, pred) * 100
             cer = calc_cer(target, pred) * 100
+
+            lm_wer = calc_wer(target, lm_pred) * 100
+            lm_cer = calc_cer(target, lm_pred) * 100
 
             rows[Path(audio_path).name] = {
                 "target": target,
@@ -233,6 +242,9 @@ class Trainer(BaseTrainer):
                 "predictions": pred,
                 "wer": wer,
                 "cer": cer,
+                "lm prediction": lm_pred,
+                "lm wer": lm_wer,
+                "lm cer": lm_cer,
             }
         self.writer.add_table("predictions", pd.DataFrame.from_dict(rows, orient="index"))
 
