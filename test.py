@@ -39,6 +39,7 @@ def main(config, out_file):
     model.load_state_dict(state_dict)
 
     # prepare model for testing
+    print(f"DEVICE: {device}")
     model = model.to(device)
     model.eval()
 
