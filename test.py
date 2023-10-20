@@ -63,7 +63,7 @@ def main(config, out_file):
             )
             batch["probs"] = batch["log_probs"].exp().cpu()
             batch["argmax"] = batch["probs"].argmax(-1)
-            all_hypos = text_encoder.ctc_lm(batch["probs"], batch["log_probs_length"], beam_size=10)
+            all_hypos = text_encoder.ctc_lm(batch["probs"], batch["log_probs_length"], beam_size=15)
             for i in range(len(batch["text"])):
                 lm_wer = calc_wer(batch["text"][i], all_hypos[i]) * 100
                 all_lm_wer.append(lm_wer)
