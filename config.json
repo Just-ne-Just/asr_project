@@ -10,6 +10,14 @@
     },
     "log_spec": true
   },
+  "text_encoder": {
+    "type": "CTCCharTextEncoder",
+    "args": {
+      "lm": true,
+      "model_path": "/kaggle/input/lm-model/3-gram.arpa",
+      "vocab_path": "/kaggle/input/lm-model/librispeech-vocab.txt"
+    }
+  },
   "augmentations": {
     "wave": [
       {
@@ -138,6 +146,20 @@
       "type": "ArgmaxCERMetric",
       "args": {
         "name": "CER (argmax)"
+      }
+    },
+    {
+      "type": "LMWERMetric",
+      "args": {
+        "name": "WER (LM)",
+        "beam_size": 3
+      }
+    },
+    {
+      "type": "LMCERMetric",
+      "args": {
+        "name": "CER (LM)",
+        "beam_size": 3
       }
     }
   ],
