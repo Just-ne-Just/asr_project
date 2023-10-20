@@ -49,7 +49,7 @@ def main(config, out_file):
         for batch_num, batch in enumerate(tqdm(dataloaders["test"])):
             batch = Trainer.move_batch_to_device(batch, device)
             output = model(**batch)
-            print(output.shape)
+            print("output done")
             if type(output) is dict:
                 batch.update(output)
             else:
@@ -68,10 +68,14 @@ def main(config, out_file):
                         "ground_trurh": batch["text"][i],
                         "pred_text_argmax": text_encoder.ctc_decode(argmax.cpu().numpy()),
                         "pred_text_beam_search": text_encoder.ctc_beam_search(
-                            batch["probs"][i], batch["log_probs_length"][i], beam_size=100
-                        )[:10],
+                            batch["probs"][i], batch["log_probs_length"][i], beam_size=3
+                        )[:2],
+                        "pred_lm": text_encoder.ctc_lm(
+                            batch["probs"][i:i+1, :, :], batch["log_probs_length"][i:i+1], beam_size=3
+                        )[:2],
                     }
                 )
+            
     with Path(out_file).open("w") as f:
         json.dump(results, f, indent=2)
 
