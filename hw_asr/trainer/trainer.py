@@ -113,7 +113,7 @@ class Trainer(BaseTrainer):
                 self.writer.add_scalar(
                     "learning rate", self.lr_scheduler.get_last_lr()[0]
                 )
-                self._log_predictions(**batch)
+                self._log_predictions(**batch, train=True)
                 self._log_spectrogram(batch["spectrogram"])
                 self._log_audio(batch["audio"])
                 self._log_scalars(self.train_metrics)
@@ -180,7 +180,7 @@ class Trainer(BaseTrainer):
                 )
             self.writer.set_step(epoch * self.len_epoch, part)
             self._log_scalars(self.evaluation_metrics)
-            self._log_predictions(**batch)
+            self._log_predictions(**batch, train=False)
             self._log_spectrogram(batch["spectrogram"])
             self._log_audio(batch["audio"])
 
@@ -206,6 +206,7 @@ class Trainer(BaseTrainer):
             log_probs_length,
             audio_path,
             examples_to_log=10,
+            train=False,
             *args,
             **kwargs,
     ):
@@ -220,10 +221,9 @@ class Trainer(BaseTrainer):
         argmax_texts_raw = [self.text_encoder.decode(inds) for inds in argmax_inds]
         argmax_texts = [self.text_encoder.ctc_decode(inds) for inds in argmax_inds]
 
-        predictions = log_probs.detach().cpu().numpy()
-        lengths = log_probs_length.detach().numpy()
-
-        all_hypos = self.text_encoder.ctc_lm(predictions, lengths, 3)
+        all_hypos = [""] * len(argmax_texts)
+        if not train:
+            all_hypos = self.text_encoder.ctc_lm(log_probs, log_probs_length, 3)
 
         tuples = list(zip(all_hypos, argmax_texts, text, argmax_texts_raw, audio_path))
         shuffle(tuples)

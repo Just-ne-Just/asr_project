@@ -17,7 +17,7 @@ class Hypothesis(NamedTuple):
 class CTCCharTextEncoder(CharTextEncoder):
     EMPTY_TOK = "^"
 
-    def __init__(self, alphabet: List[str] = None, lm = False):
+    def __init__(self, alphabet: List[str] = None, lm = False, model_path = None, vocab_path = None):
         super().__init__(alphabet)
         self.vocab = [self.EMPTY_TOK] + list(self.alphabet)
         self.ind2char = dict(enumerate(self.vocab))
@@ -25,11 +25,15 @@ class CTCCharTextEncoder(CharTextEncoder):
         self.lm = lm
 
         if self.lm:
-            vocab_for_lm = [elem.upper() for elem in self.vocab[1:]]
             self.model = build_ctcdecoder(
-                vocab_for_lm,
-                kenlm_model_path=str(ROOT_PATH / 'data' / 'kenlm' / '4-gram.arpa')
+                [""] + [a.upper() for a in self.alphabet],
+                unigrams=self._get_vocab_from_file(str(ROOT_PATH / 'data' / 'kenlm' / 'librispeech-vocab.txt')) if vocab_path is None else self._get_vocab_from_file(vocab_path),
+                kenlm_model_path=str(ROOT_PATH / 'data' / 'kenlm' / '3-gram.arpa') if model_path is None else model_path
             )
+
+    def _get_vocab_from_file(self, vocab_path):
+        with open(vocab_path, 'r') as f:
+            return list(map(lambda x: x.strip(), f.readlines()))
 
     def ctc_decode(self, inds: List[int]) -> str:
         last_char = self.char2ind[self.EMPTY_TOK]
@@ -46,11 +50,9 @@ class CTCCharTextEncoder(CharTextEncoder):
     def ctc_lm(self, probs: torch.tensor, probs_length: torch.tensor,
             beam_size: int = 100) -> List[str]:
             
-        # probs = torch.nn.functional.log_softmax(probs, -1)
+        logits_list = np.array([probs[i][:probs_length[i]].detach().cpu().numpy() for i in range(probs_length.shape[0])])
 
-        logits_list = np.array([probs[i][:probs_length[i]].numpy() for i in range(probs_length.shape[0])])
-
-        with multiprocessing.Pool() as p:
+        with multiprocessing.get_context("fork").Pool() as p:
             hypos = self.model.decode_batch(p, logits_list, beam_width=beam_size)
 
         hypos = [elem.replace("|", "").replace("??", "").replace("'", "").lower().strip() for elem in hypos]

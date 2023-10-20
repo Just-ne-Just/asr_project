@@ -16,10 +16,20 @@
     "spectrogram": [
     ]
   },
+  "text_encoder": {
+    "type": "CTCCharTextEncoder",
+    "args": {
+      "lm": true,
+      "model_path": "/kaggle/input/lm-model/3-gram.arpa",
+      "vocab_path": "/kaggle/input/lm-model/librispeech-vocab.txt"
+    }
+  },
   "arch": {
     "type": "DeepSpeech",
     "args": {
-      "n_feats": 128
+      "n_feats": 128,
+      "rnn_hidden": 256,
+      "num_rnn_layers": 3
     }
   },
   "data": {
@@ -33,7 +43,8 @@
             "part": "dev-clean",
             "max_audio_length": 20.0,
             "max_text_length": 200,
-            "limit": 10
+            "limit": 10,
+            "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
           }
         }
       ]
@@ -48,7 +59,8 @@
             "part": "dev-clean",
             "max_audio_length": 20.0,
             "max_text_length": 200,
-            "limit": 10
+            "limit": 10,
+            "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
           }
         }
       ]
@@ -75,6 +87,20 @@
       "type": "ArgmaxCERMetric",
       "args": {
         "name": "CER (argmax)"
+      }
+    },
+    {
+      "type": "LMWERMetric",
+      "args": {
+        "name": "WER (LM)",
+        "beam_size": 3
+      }
+    },
+    {
+      "type": "LMCERMetric",
+      "args": {
+        "name": "CER (LM)",
+        "beam_size": 3
       }
     }
   ],
