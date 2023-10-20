@@ -49,6 +49,9 @@ class CTCCharTextEncoder(CharTextEncoder):
     
     def ctc_lm(self, probs: torch.tensor, probs_length: torch.tensor,
             beam_size: int = 100) -> List[str]:
+        
+        if len(probs.shape) == 2:
+            probs = probs.unsqueeze(0)
             
         logits_list = np.array([probs[i][:probs_length[i]].detach().cpu().numpy() for i in range(probs_length.shape[0])])
 
