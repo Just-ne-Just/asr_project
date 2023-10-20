@@ -49,6 +49,7 @@ def main(config, out_file):
         for batch_num, batch in enumerate(tqdm(dataloaders["test"])):
             batch = Trainer.move_batch_to_device(batch, device)
             output = model(**batch)
+            print(output.shape)
             if type(output) is dict:
                 batch.update(output)
             else:
