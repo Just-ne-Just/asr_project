@@ -38,7 +38,7 @@ class LMWERMetric(BaseMetric):
         predictions = torch.argmax(log_probs, dim=-1)
         lengths = log_probs_length
 
-        pred_texts = self.text_encoder.ctc_lm(predictions, lengths, beam_size=self.beam_size)
+        pred_texts = self.text_encoder.ctc_lm(log_probs, lengths, beam_size=self.beam_size)
         for pred_text, target_text in zip(pred_texts, text):
             target_text = BaseTextEncoder.normalize_text(target_text)
             wers.append(calc_wer(target_text, pred_text))
