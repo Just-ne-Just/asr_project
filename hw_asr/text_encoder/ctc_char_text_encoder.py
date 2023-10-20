@@ -52,6 +52,9 @@ class CTCCharTextEncoder(CharTextEncoder):
         
         if len(probs.shape) == 2:
             probs = probs.unsqueeze(0)
+        
+        if len(probs_length.shape) == 1:
+            probs_length = probs_length.unsqueeze(0)
             
         logits_list = np.array([probs[i][:probs_length[i]].detach().cpu().numpy() for i in range(probs_length.shape[0])])
 
