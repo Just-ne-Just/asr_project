@@ -58,7 +58,6 @@ def main(config, out_file):
         for batch_num, batch in enumerate(tqdm(dataloaders["test"])):
             batch = Trainer.move_batch_to_device(batch, device)
             output = model(**batch)
-            print("output done")
             if type(output) is dict:
                 batch.update(output)
             else:
@@ -107,7 +106,7 @@ def main(config, out_file):
                         "lm_cer": lm_cer
                     }
                 )
-                print(results)
+                print(results[-1]["pred_text_beam_search"], results[-1]["beam_wer"], results[-1]["beam_cer"])
         results.append(
             {
                 "GLOBAL LM WER": {sum(all_lm_wer) / len(all_lm_wer)},
