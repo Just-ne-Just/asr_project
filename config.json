@@ -131,7 +131,7 @@
         {
           "type": "LibrispeechDataset",
           "args": {
-            "part": "test-other",
+            "part": "test-clean",
             "data_dir": "/kaggle/input/librispeech/test-clean/LibriSpeech"
           }
         }
