@@ -108,12 +108,12 @@ def main(config, out_file):
                 )
         results.append(
             {
-                "GLOBAL LM WER": {sum(all_lm_wer) / len(all_lm_wer)},
-                "GLOBAL LM CER": {sum(all_lm_cer) / len(all_lm_cer)},
-                "GLOBAL ARGMAX WER": {sum(all_argmax_wer) / len(all_argmax_wer)},
-                "GLOBAL ARGMAX CER": {sum(all_argmax_cer) / len(all_argmax_cer)},
-                "GLOBAL BEAM WER": {sum(all_beam_wer) / len(all_beam_wer)},
-                "GLOBAL BEAM CER": {sum(all_beam_cer) / len(all_beam_cer)},
+                "GLOBAL LM WER": sum(all_lm_wer) / len(all_lm_wer),
+                "GLOBAL LM CER": sum(all_lm_cer) / len(all_lm_cer),
+                "GLOBAL ARGMAX WER": sum(all_argmax_wer) / len(all_argmax_wer),
+                "GLOBAL ARGMAX CER": sum(all_argmax_cer) / len(all_argmax_cer),
+                "GLOBAL BEAM WER": sum(all_beam_wer) / len(all_beam_wer),
+                "GLOBAL BEAM CER": sum(all_beam_cer) / len(all_beam_cer),
             }
         )
             
