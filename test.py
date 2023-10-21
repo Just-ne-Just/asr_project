@@ -49,6 +49,12 @@ def main(config, out_file):
     with torch.no_grad():
         all_lm_wer = []
         all_lm_cer = []
+
+        all_argmax_wer = []
+        all_argmax_cer = []
+
+        all_beam_wer = []
+        all_beam_cer = []
         for batch_num, batch in enumerate(tqdm(dataloaders["test"])):
             batch = Trainer.move_batch_to_device(batch, device)
             output = model(**batch)
@@ -69,22 +75,48 @@ def main(config, out_file):
                 all_lm_wer.append(lm_wer)
                 lm_cer = calc_cer(batch["text"][i], all_hypos[i]) * 100
                 all_lm_cer.append(lm_cer)
+
                 argmax = batch["argmax"][i]
                 argmax = argmax[: int(batch["log_probs_length"][i])]
+                argmax_pred = text_encoder.ctc_decode(argmax.cpu().numpy())
+                argmax_wer = calc_wer(batch["text"][i], argmax_pred) * 100
+                all_argmax_wer.append(argmax_wer)
+                argmax_cer = calc_cer(batch["text"][i], argmax_pred) * 100
+                all_argmax_cer.append(argmax_cer)
+
+                beam_search_pred = text_encoder.ctc_beam_search(
+                            batch["probs"][i], batch["log_probs_length"][i], beam_size=3
+                        )[0].text
+                beam_wer = calc_wer(batch["text"][i], beam_search_pred) * 100
+                all_beam_wer.append(beam_wer)
+                beam_cer = calc_cer(batch["text"][i], beam_search_pred) * 100
+                all_beam_cer.append(beam_cer)
+                
+
                 results.append(
                     {
                         "ground_trurh": batch["text"][i],
-                        "pred_text_argmax": text_encoder.ctc_decode(argmax.cpu().numpy()),
-                        # "pred_text_beam_search": text_encoder.ctc_beam_search(
-                        #     batch["probs"][i], batch["log_probs_length"][i], beam_size=3
-                        # )[:2],
-                        # "pred_lm": text_encoder.ctc_lm(
-                        #     batch["probs"], batch["log_probs_length"], beam_size=3
-                        # ),
+                        "pred_text_argmax": argmax_pred,
+                        "argmar_wer": argmax_wer,
+                        "argmar_cer": argmax_cer,
+                        "pred_text_beam_search": beam_search_pred,
+                        "beam_wer": beam_wer,
+                        "beam_cer": beam_cer,
+                        "pred_lm": all_hypos[i],
+                        "lm_wer": lm_wer,
+                        "lm_cer": lm_cer
                     }
                 )
-        print(f"LM WER: {sum(all_lm_wer) / len(all_lm_wer)}")
-        print(f"LM CER: {sum(all_lm_cer) / len(all_lm_cer)}")
+        results.append(
+            {
+                "GLOBAL LM WER": {sum(all_lm_wer) / len(all_lm_wer)},
+                "GLOBAL LM CER": {sum(all_lm_cer) / len(all_lm_cer)},
+                "GLOBAL ARGMAX WER": {sum(all_argmax_wer) / len(all_argmax_wer)},
+                "GLOBAL ARGMAX CER": {sum(all_argmax_cer) / len(all_argmax_cer)},
+                "GLOBAL BEAM WER": {sum(all_beam_wer) / len(all_beam_wer)},
+                "GLOBAL BEAM CER": {sum(all_beam_cer) / len(all_beam_cer)},
+            }
+        )
             
     with Path(out_file).open("w") as f:
         json.dump(results, f, indent=2)
