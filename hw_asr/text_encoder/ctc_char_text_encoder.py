@@ -62,8 +62,8 @@ class CTCCharTextEncoder(CharTextEncoder):
     
     def _extend_and_merge(self, frame, state):
         new_state = defaultdict(float)
-        for next_char_index, next_char_proba in enumerate(frame):
-            for (pref, last_char), pref_proba in state.items():
+        for (pref, last_char), pref_proba in state.items():
+            for next_char_index, next_char_proba in enumerate(frame):
                 next_char = self.ind2char[next_char_index]
                 if next_char == last_char:
                     new_pref = pref
@@ -90,6 +90,7 @@ class CTCCharTextEncoder(CharTextEncoder):
         char_length, voc_size = probs.shape
         assert voc_size == len(self.ind2char)
         probs = torch.log(probs)
+        probs = probs[:probs_length]
         hypos: List[Hypothesis] = []
         state = {('', self.EMPTY_TOK): 1.0}
 
