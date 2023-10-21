@@ -107,6 +107,7 @@ def main(config, out_file):
                         "lm_cer": lm_cer
                     }
                 )
+                print(results)
         results.append(
             {
                 "GLOBAL LM WER": {sum(all_lm_wer) / len(all_lm_wer)},
