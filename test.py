@@ -106,7 +106,6 @@ def main(config, out_file):
                         "lm_cer": lm_cer
                     }
                 )
-                print(results[-1]["pred_text_beam_search"], results[-1]["beam_wer"], results[-1]["beam_cer"])
         results.append(
             {
                 "GLOBAL LM WER": {sum(all_lm_wer) / len(all_lm_wer)},
