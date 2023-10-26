@@ -5,7 +5,10 @@
 ```shell
 pip install -r ./requirements.txt
 ```
-
+## LM model weights
+```
+https://www.kaggle.com/datasets/leonbebra/lm-model/settings
+```
 ## Recommended implementation order
 
 You might be a little intimidated by the number of folders and classes. Try to follow this steps to gradually undestand
