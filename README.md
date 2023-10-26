@@ -7,7 +7,7 @@ pip install -r ./requirements.txt
 ```
 ## LM model weights
 ```
-https://www.kaggle.com/datasets/leonbebra/lm-model/settings
+https://www.kaggle.com/datasets/leonbebra/lm-model
 ```
 ## Recommended implementation order
 
