@@ -1,50 +1,47 @@
 # ASR project barebones
-
+## Автор
+Семаков Андрей Игоревич
+## Лицензия
+Апаче 2.0 так уж и быть
 ## Installation guide
 
-< Write your installation guide here >
-
 ```shell
-pip install -r ./requirements.txt
+pip install -r ./requirements.txt - версии указал, по идее, все должно заработать
 ```
+```
+Веса asr модели можно скачать с помощью git lfs pull. Самые крутые веса лежат в saved/models/default_config/success_360_512_aug/model_best.pth
+```
+```
+Веса lm модели можно скачать тут https://www.kaggle.com/datasets/leonbebra/lm-model
+```
+```
+Запуск train: python train.py -c <путь до конфига> -r <путь до чекпоинта>
+Желательно перед этим прописать в config.py корректные пути до датасетов и поставить в конфиге text_encoder.lm = False и убрать из конфига LMWERMetric, LMCERMetric
+```
+```
+Запуск test: python test.py -c <путь до конфига, где есть data.test> -r <путь до чекпоинта> -b <число, размер батча> -o <имя выходного файла> -t <путь до кастомного тестового датасета (лучше не использовать)> -j <количество потоков>
+Метрики считаются сами и выписани в самом низу выходного файла (под всеми предсказаниями)
+```
+## LM model weights
+```
+https://www.kaggle.com/datasets/leonbebra/lm-model
+```
+## Описание проекта
+ASR английской речи
 
-## Recommended implementation order
-
-You might be a little intimidated by the number of folders and classes. Try to follow this steps to gradually undestand
-the workflow.
-
-1) Test `hw_asr/tests/test_dataset.py`  and `hw_asr/tests/test_config.py` and make sure everythin works for you
-2) Implement missing functions to fix tests in  `hw_asr\tests\test_text_encoder.py`
-3) Implement missing functions to fix tests in  `hw_asr\tests\test_dataloader.py`
-4) Implement functions in `hw_asr\metric\utils.py`
-5) Implement missing function to run `train.py` with a baseline model
-6) Write your own model and try to overfit it on a single batch
-7) Implement ctc beam search and add metrics to calculate WER and CER over hypothesis obtained from beam search.
-8) ~~Pain and suffering~~ Implement your own models and train them. You've mastered this template when you can tune your
-   experimental setup just by tuning `configs.json` file and running `train.py`
-9) Don't forget to write a report about your work
-10) Get hired by Google the next day
-
-## Before submitting
-
-0) Make sure your projects run on a new machine after complemeting the installation guide or by 
-   running it in docker container.
-1) Search project for `# TODO: your code here` and implement missing functionality
-2) Make sure all tests work without errors
-   ```shell
-   python -m unittest discover hw_asr/tests
-   ```
-3) Make sure `test.py` works fine and works as expected. You should create files `default_test_config.json` and your
-   installation guide should download your model checpoint and configs in `default_test_model/checkpoint.pth`
-   and `default_test_model/config.json`.
-   ```shell
-   python test.py \
-      -c default_test_config.json \
-      -r default_test_model/checkpoint.pth \
-      -t test_data \
-      -o test_result.json
-   ```
-4) Use `train.py` for training
+## Структура репозитория
+```
+train.py - скрипт, с помощью которого запускается обучение модели
+```
+```
+test.py - скрипт, с помощью которого запускается инференс модели на тестовом датасете
+```
+```
+asr_project/config.json - основной конфиг, который используется для теста и обучения 
+```
+```
+asr_project/hw_asr - все остальные сурсы 
+```
 
 ## Credits
 
@@ -71,12 +68,3 @@ Notes:
   the start of every docker run.
 * `-e WANDB_API_KEY=<your_wandb_api_key>` -- set envvar for wandb (if you want to use it). You can find your API key
   here: https://wandb.ai/authorize
-
-## TODO
-
-These barebones can use more tests. We highly encourage students to create pull requests to add more tests / new
-functionality. Current demands:
-
-* Tests for beam search
-* README section to describe folders
-* Notebook to show how to work with `ConfigParser` and `config_parser.init_obj(...)`
