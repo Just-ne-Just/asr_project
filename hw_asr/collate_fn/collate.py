@@ -11,33 +11,47 @@ def collate_fn(dataset_items: List[dict]):
     Collate and pad fields in dataset items
     """
 
-    audio = []
-    spec = []
-    spec_length = []
-    text_encoded = []
-    text_encoded_length = []
-    text = []
-    audio_path = []
+    references = []
+    references_length = []
+    mixes = []
+    mixes_length = []
+    targets = []
+    targets_length = []
+    speaker_ids = []
+    names = []
 
     for item in dataset_items:
-        audio.append(item['audio'][0])
-        spec.append(item['spectrogram'][0].T)
-        spec_length.append(item['spectrogram'].shape[2])
-        text_encoded.append(item['text_encoded'][0])
-        text_encoded_length.append(len(item['text_encoded'][0]))
-        text.append(item['text'])
-        audio_path.append(item['audio_path'])
+        references.append(item['ref_wave'][0])
+        references_length.append(item['ref_wave'].shape[-1])
+
+        mixes.append(item['mix_wave'][0])
+        mixes_length.append(item['mix_wave'].shape[-1])
+
+        targets.append(item['target_wave'][0])
+        targets_length.append(item['target_wave'].shape[-1])
+
+        speaker_ids.append(item['speaker_id'])
+        names.append(item['name'])
     
-    audio = pad_sequence(audio, batch_first=True)
-    spec = pad_sequence(spec, batch_first=True).transpose(1, 2)
-    text_encoded = pad_sequence(text_encoded, batch_first=True)
-        
+    references = pad_sequence(references, batch_first=True).unsqueeze(1)
+    references_length = torch.tensor(references_length)
+
+    mixes_targets = pad_sequence(mixes + targets, batch_first=True).unsqueeze(1)
+
+    mixes = mixes_targets[:len(mixes_targets) // 2]
+    mixes_length = torch.tensor(mixes_length)
+
+    targets = mixes_targets[len(mixes_targets) // 2:]
+    targets_length = torch.tensor(targets_length)
+
+
     return {
-        "audio": audio,
-        "spectrogram": spec,
-        "spectrogram_length": torch.tensor(spec_length),
-        "text_encoded": text_encoded,
-        "text_encoded_length": torch.tensor(text_encoded_length),
-        "text": text,
-        "audio_path": audio_path
+        "references": references,
+        "references_length": references_length,
+        "mixes": mixes,
+        "mixes_length": mixes_length,
+        "targets": targets,
+        "targets_length": targets_length,
+        "speaker_ids": torch.tensor(speaker_ids),
+        "names": names
     }

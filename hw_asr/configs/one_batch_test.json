@@ -16,102 +16,108 @@
     "spectrogram": [
     ]
   },
-  "text_encoder": {
-    "type": "CTCCharTextEncoder",
-    "args": {
-      "lm": true,
-      "model_path": "/kaggle/input/lm-model/3-gram.arpa",
-      "vocab_path": "/kaggle/input/lm-model/librispeech-vocab.txt"
-    }
-  },
   "arch": {
-    "type": "DeepSpeech",
+    "type": "SpEx",
     "args": {
-      "n_feats": 128,
-      "rnn_hidden": 256,
-      "num_rnn_layers": 3
+      "short_length": 20, 
+      "middle_length": 80,
+      "long_length": 160,
+      "in_channels": 32,
+      "stack_size": 8,
+      "num_stacks": 4,
+      "kernel_size": 3,
+      "proj_channels": 32,
+      "out_channels": 64, 
+      "speaker_dim": 32
     }
   },
   "data": {
     "train": {
-      "batch_size": 10,
+      "batch_size": 4,
       "num_workers": 0,
       "datasets": [
         {
-          "type": "LibrispeechDataset",
+          "type": "LibrispeechTripletDataset",
           "args": {
+            "mixer_config": {
+              "nfiles": 10000,
+              "test": false,
+              "path": "D:\\asr_project_template\\data\\datasets\\librispeech\\mixer",
+              "snr_levels": [-5, 5],
+              "num_workers": 2,
+              "trim_db": 20,
+              "vad_db": 20,
+              "audio_len": 3
+            },
             "part": "dev-clean",
-            "max_audio_length": 20.0,
-            "max_text_length": 200,
-            "limit": 10,
-            "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
+            "limit": 4
           }
         }
       ]
     },
     "val": {
-      "batch_size": 10,
+      "batch_size": 4,
       "num_workers": 0,
       "datasets": [
         {
-          "type": "LibrispeechDataset",
+          "type": "LibrispeechTripletDataset",
           "args": {
+            "mixer_config": {
+              "nfiles": 10000,
+              "test": true,
+              "path": "D:\\asr_project_template\\data\\datasets\\librispeech\\mixer",
+              "snr_levels": [-5, 5],
+              "num_workers": 2,
+              "vad_db": 20,
+              "audio_len": 3
+            },
             "part": "dev-clean",
-            "max_audio_length": 20.0,
-            "max_text_length": 200,
-            "limit": 10,
-            "data_dir": "/kaggle/input/librispeech-asr-wav-dataset"
+            "limit": 4
           }
         }
       ]
     }
   },
   "optimizer": {
-    "type": "SGD",
+    "type": "AdamW",
     "args": {
-      "lr": 1e-2
+      "lr": 1e-3,
+      "weight_decay": 1e-5
     }
   },
   "loss": {
-    "type": "CTCLoss",
-    "args": {}
+    "type": "SISDRLoss",
+    "args": {
+    }
   },
   "metrics": [
     {
-      "type": "ArgmaxWERMetric",
+      "type": "SISDRMetric",
       "args": {
-        "name": "WER (argmax)"
+        "name": "SI-SDR"
       }
     },
     {
-      "type": "ArgmaxCERMetric",
+      "type": "AccuracyMetric",
       "args": {
-        "name": "CER (argmax)"
+        "name": "ACCURACY"
       }
     },
     {
-      "type": "LMWERMetric",
+      "type": "PESQMetric",
       "args": {
-        "name": "WER (LM)",
-        "beam_size": 3
-      }
-    },
-    {
-      "type": "LMCERMetric",
-      "args": {
-        "name": "CER (LM)",
-        "beam_size": 3
+        "name": "PESQ"
       }
     }
   ],
   "lr_scheduler": {
-    "type": "OneCycleLR",
+    "type": "ReduceLROnPlateau",
     "args": {
-      "steps_per_epoch": 100,
-      "epochs": 50,
-      "anneal_strategy": "cos",
-      "max_lr": 1e-2,
-      "pct_start": 0.2
+      "mode": "min",
+      "factor": 0.5,
+      "patience": 1,
+      "min_lr": 0.0,
+      "verbose": true
     }
   },
   "trainer": {
@@ -122,7 +128,7 @@
     "monitor": "min val_loss",
     "early_stop": 100,
     "visualize": "wandb",
-    "wandb_project": "asr_project",
+    "wandb_project": "ss_project",
     "len_epoch": 100,
     "grad_norm_clip": 10
   }

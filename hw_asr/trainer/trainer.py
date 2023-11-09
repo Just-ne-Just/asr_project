@@ -31,14 +31,12 @@ class Trainer(BaseTrainer):
             config,
             device,
             dataloaders,
-            text_encoder,
             lr_scheduler=None,
             len_epoch=None,
             skip_oom=True,
     ):
         super().__init__(model, criterion, metrics, optimizer, config, device, lr_scheduler)
         self.skip_oom = skip_oom
-        self.text_encoder = text_encoder
         self.config = config
         self.train_dataloader = dataloaders["train"]
         if len_epoch is None:
@@ -63,7 +61,13 @@ class Trainer(BaseTrainer):
         """
         Move all necessary tensors to the HPU
         """
-        for tensor_for_gpu in ["spectrogram", "text_encoded"]:
+        for tensor_for_gpu in ["references",
+                               "references_length",
+                               "mixes",
+                               "mixes_length",
+                               "targets",
+                               "targets_length",
+                               "speaker_ids"]:
             batch[tensor_for_gpu] = batch[tensor_for_gpu].to(device)
         return batch
 
@@ -111,11 +115,9 @@ class Trainer(BaseTrainer):
                     )
                 )
                 self.writer.add_scalar(
-                    "learning rate", self.lr_scheduler.get_last_lr()[0]
+                    "learning rate", self.optimizer.param_groups[0]['lr']
                 )
                 self._log_predictions(**batch, train=True)
-                self._log_spectrogram(batch["spectrogram"])
-                self._log_audio(batch["audio"])
                 self._log_scalars(self.train_metrics)
                 # we don't want to reset train metrics at the start of every epoch
                 # because we are interested in recent train metrics
@@ -128,6 +130,8 @@ class Trainer(BaseTrainer):
         for part, dataloader in self.evaluation_dataloaders.items():
             val_log = self._evaluation_epoch(epoch, part, dataloader)
             log.update(**{f"{part}_{name}": value for name, value in val_log.items()})
+        
+        self.lr_scheduler.step(log["val_loss"])
 
         return log
 
@@ -136,27 +140,18 @@ class Trainer(BaseTrainer):
         if is_train:
             self.optimizer.zero_grad()
         outputs = self.model(**batch)
-        if type(outputs) is dict:
-            batch.update(outputs)
-        else:
-            batch["logits"] = outputs
-
-        batch["log_probs"] = F.log_softmax(batch["logits"], dim=-1)
-        batch["log_probs_length"] = self.model.transform_input_lengths(
-            batch["spectrogram_length"]
-        )
-        batch["loss"] = self.criterion(**batch)
+        batch.update(outputs)
+        batch["loss"] = self.criterion(**batch, train=is_train)
         if is_train:
             batch["loss"].backward()
             self._clip_grad_norm()
             self.optimizer.step()
-            if self.lr_scheduler is not None:
-                self.lr_scheduler.step()
+            # if self.lr_scheduler is not None:
+            #     self.lr_scheduler.step()
 
         metrics.update("loss", batch["loss"].item())
         for met in self.metrics:
-            if not is_train or "LM" not in met.name:
-                metrics.update(met.name, met(**batch))
+            metrics.update(met.name, met(**batch), n=len(batch["mixes"]))
         return batch
 
     def _evaluation_epoch(self, epoch, part, dataloader):
@@ -182,8 +177,6 @@ class Trainer(BaseTrainer):
             self.writer.set_step(epoch * self.len_epoch, part)
             self._log_scalars(self.evaluation_metrics)
             self._log_predictions(**batch, train=False)
-            self._log_spectrogram(batch["spectrogram"])
-            self._log_audio(batch["audio"])
 
         # add histogram of model parameters to the tensorboard
         for name, p in self.model.named_parameters():
@@ -202,50 +195,31 @@ class Trainer(BaseTrainer):
 
     def _log_predictions(
             self,
-            text,
-            log_probs,
-            log_probs_length,
-            audio_path,
-            examples_to_log=10,
+            references,
+            mixes,
+            targets,
+            speaker_ids,
+            names,
+            short,
+            middle,
+            long,
             train=False,
+            examples_to_log=10,
             *args,
             **kwargs,
     ):
         # TODO: implement logging of beam search results
         if self.writer is None:
             return
-        argmax_inds = log_probs.cpu().argmax(-1).numpy()
-        argmax_inds = [
-            inds[: int(ind_len)]
-            for inds, ind_len in zip(argmax_inds, log_probs_length.numpy())
-        ]
-        argmax_texts_raw = [self.text_encoder.decode(inds) for inds in argmax_inds]
-        argmax_texts = [self.text_encoder.ctc_decode(inds) for inds in argmax_inds]
-
-        all_hypos = [""] * len(argmax_texts)
-        if not train:
-            all_hypos = self.text_encoder.ctc_lm(log_probs, log_probs_length, 3)
-
-        tuples = list(zip(all_hypos, argmax_texts, text, argmax_texts_raw, audio_path))
+        tuples = list(zip(mixes, short, names, targets, references))
         shuffle(tuples)
         rows = {}
-        for lm_pred, pred, target, raw_pred, audio_path in tuples[:examples_to_log]:
-            target = BaseTextEncoder.normalize_text(target)
-            wer = calc_wer(target, pred) * 100
-            cer = calc_cer(target, pred) * 100
-
-            lm_wer = calc_wer(target, lm_pred) * 100
-            lm_cer = calc_cer(target, lm_pred) * 100
-
-            rows[Path(audio_path).name] = {
-                "target": target,
-                "raw prediction": raw_pred,
-                "predictions": pred,
-                "wer": wer,
-                "cer": cer,
-                "lm prediction": lm_pred,
-                "lm wer": lm_wer,
-                "lm cer": lm_cer,
+        for mix, short_, name, target, reference in tuples[:examples_to_log]:
+            rows[name] = {
+                "mix": self.writer.wandb.Audio(mix[0].detach().cpu().numpy(), sample_rate=16000),
+                "short": self.writer.wandb.Audio(short_[0].detach().cpu().numpy(), sample_rate=16000),
+                "target": self.writer.wandb.Audio(target[0].detach().cpu().numpy(), sample_rate=16000),
+                "reference": self.writer.wandb.Audio(reference[0].detach().cpu().numpy(), sample_rate=16000),
             }
         self.writer.add_table("predictions", pd.DataFrame.from_dict(rows, orient="index"))
 

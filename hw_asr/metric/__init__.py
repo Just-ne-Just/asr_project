@@ -1,12 +1,9 @@
-from hw_asr.metric.cer_metric import ArgmaxCERMetric
-from hw_asr.metric.wer_metric import ArgmaxWERMetric
-from hw_asr.metric.wer_metric import LMWERMetric
-from hw_asr.metric.cer_metric import LMCERMetric
-
+from hw_asr.metric.accuracy_metric import AccuracyMetric
+from hw_asr.metric.sisdr_metric import SISDRMetric
+from hw_asr.metric.pesq_metric import PESQMetric
 
 __all__ = [
-    "ArgmaxWERMetric",
-    "ArgmaxCERMetric",
-    "LMWERMetric",
-    "LMCERMetric"
+    "AccuracyMetric",
+    "SISDRMetric",
+    "PESQMetric"
 ]
