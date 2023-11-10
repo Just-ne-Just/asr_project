@@ -11,7 +11,7 @@ class SISDRLoss(nn.Module):
         self.alpha = alpha
         self.beta = beta
         self.gamma = gamma
-        self.sisdr = ScaleInvariantSignalDistortionRatio().to(device)
+        self.sisdr = ScaleInvariantSignalDistortionRatio(zero_mean=True).to(device)
 
     def forward(self, short, middle, long, targets, speaker_ids, logits, train=True, **kwargs):
         sisdr_short = self.sisdr(short.squeeze(1), targets.squeeze(1))
