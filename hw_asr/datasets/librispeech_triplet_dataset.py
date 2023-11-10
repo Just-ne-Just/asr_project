@@ -60,7 +60,6 @@ class LibrispeechTripletDataset(BaseDataset):
     
     def _create_mix(self, split_dir, mix_dir):
         speakers_files = self._get_files(split_dir)
-        print(speakers_files)
         
         nfiles = self.mixer_config["nfiles"]
         test = self.mixer_config["test"]

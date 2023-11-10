@@ -215,6 +215,7 @@ class Trainer(BaseTrainer):
         shuffle(tuples)
         rows = {}
         for mix, short_, name, target, reference in tuples[:examples_to_log]:
+            short_ = 20 * short_ / short_.norm(dim=-1, keepdim=True)
             rows[name] = {
                 "mix": self.writer.wandb.Audio(mix[0].detach().cpu().numpy(), sample_rate=16000),
                 "short": self.writer.wandb.Audio(short_[0].detach().cpu().numpy(), sample_rate=16000),
