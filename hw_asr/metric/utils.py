@@ -19,5 +19,5 @@ def calc_wer(target_text, predicted_text) -> float:
 #     return 20 * np.log10(np.linalg.norm(target) / (np.linalg.norm(target - est) + 1e-6) + 1e-6)
 
 def calc_si_sdr(est, target):
-    alpha = (target * est).sum() / torch.linalg.norm(target)**2
-    return 20 * torch.log10(torch.linalg.norm(alpha * target) / (torch.linalg.norm(alpha * target - est) + 1e-6) + 1e-6)
+    alpha = (target * est).sum(dim=-1) / torch.linalg.norm(target, dim=-1)**2
+    return 20 * torch.log10(torch.linalg.norm(alpha.unsqueeze(1) * target, dim=-1) / (torch.linalg.norm(alpha.unsqueeze(1) * target - est, dim=-1) + 1e-6) + 1e-6)
