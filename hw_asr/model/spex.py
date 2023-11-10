@@ -76,6 +76,8 @@ class ResNet(nn.Module):
         self.norm_2 = nn.BatchNorm1d(out_channels)
 
         self.max_pool = nn.MaxPool1d(3)
+
+        self.need_proj = (in_channels != out_channels)
     
     def forward(self, x):
         new_x = self.conv_1(x)
@@ -83,7 +85,7 @@ class ResNet(nn.Module):
         new_x = self.activation_1(new_x)
         new_x = self.conv_2(new_x)
         new_x = self.norm_2(new_x)
-        new_x = new_x + self.conv_eq(x)
+        new_x = new_x + self.conv_eq(x) if self.need_proj else new_x + x
         new_x = self.activation_2(new_x)
         return self.max_pool(new_x)
     
