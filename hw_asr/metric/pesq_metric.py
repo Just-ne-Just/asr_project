@@ -10,12 +10,11 @@ def audio_norm(audio):
     return 20 * audio / audio.norm(dim=-1, keepdim=True)
 
 class PESQMetric(BaseMetric):
-    def __init__(self, fs=16000, mode='wb', *args, **kwargs):
+    def __init__(self, fs=16000, mode='wb', device='cuda:0', *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.pesq = PerceptualEvaluationSpeechQuality(fs, mode)
+        self.pesq = PerceptualEvaluationSpeechQuality(fs, mode).to(device)
 
     def __call__(self, short, targets, **kwargs):
         targets = targets.squeeze(1)
         short = short.squeeze(1)
-        self.pesq = self.pesq.to(short.device)
         return self.pesq(audio_norm(short), targets).mean()
