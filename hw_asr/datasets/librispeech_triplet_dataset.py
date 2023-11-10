@@ -87,7 +87,7 @@ class LibrispeechTripletDataset(BaseDataset):
     def _create_index(self, part):
         index = []
         split_dir = self._data_dir / part
-        mix_dir = Path(self.mixer_config["path"]) / f"{part}-mix"
+        mix_dir = Path(self.mixer_config["path"]) / f"{part}-mixed"
 
 
         if not mix_dir.exists():
