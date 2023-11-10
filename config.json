@@ -46,7 +46,7 @@
       ]
     },
     "val": {
-      "batch_size": 3,
+      "batch_size": 1,
       "num_workers": 0,
       "datasets": [
         {
@@ -111,7 +111,7 @@
     }
   },
   "trainer": {
-    "epochs": 100,
+    "epochs": 50,
     "save_dir": "saved/",
     "save_period": 5,
     "verbosity": 2,
