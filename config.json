@@ -19,21 +19,34 @@
   "arch": {
     "type": "SpEx",
     "args": {
-      "short_length": 20, 
-      "middle_length": 80,
-      "long_length": 160,
-      "in_channels": 32,
-      "stack_size": 8,
-      "num_stacks": 4,
-      "kernel_size": 3,
-      "proj_channels": 32,
-      "out_channels": 64, 
-      "speaker_dim": 32
     }
   },
   "data": {
+    "train": {
+      "batch_size": 3,
+      "num_workers": 0,
+      "datasets": [
+        {
+          "type": "LibrispeechTripletDataset",
+          "args": {
+            "mixer_config": {
+              "nfiles": 10000,
+              "test": false,
+              "path": "/kaggle/input/librispeech-mix/train-clean-100-mix",
+              "snr_levels": [-5, 5],
+              "num_workers": 2,
+              "trim_db": 20,
+              "vad_db": 20,
+              "audio_len": 3
+            },
+            "part": "train-clean-100",
+            "data_dir": "/kaggle/input/librispeech/train-clean-100/LibriSpeech"
+          }
+        }
+      ]
+    },
     "val": {
-      "batch_size": 4,
+      "batch_size": 3,
       "num_workers": 0,
       "datasets": [
         {
@@ -42,14 +55,13 @@
             "mixer_config": {
               "nfiles": 10000,
               "test": true,
-              "path": "/kaggle/working/mixer",
+              "path": "/kaggle/input/librispeech-mix/test-clean-mix/kaggle/working/mixer",
               "snr_levels": [-5, 5],
               "num_workers": 2,
               "vad_db": 20,
               "audio_len": 3
             },
             "part": "test-clean",
-            "limit": 4,
             "data_dir": "/kaggle/input/librispeech/test-clean/LibriSpeech"
           }
         }
@@ -59,7 +71,7 @@
   "optimizer": {
     "type": "AdamW",
     "args": {
-      "lr": 1e-3,
+      "lr": 2.5e-4,
       "weight_decay": 1e-5
     }
   },
@@ -93,13 +105,13 @@
     "args": {
       "mode": "min",
       "factor": 0.5,
-      "patience": 1,
+      "patience": 2,
       "min_lr": 0.0,
       "verbose": true
     }
   },
   "trainer": {
-    "epochs": 50,
+    "epochs": 100,
     "save_dir": "saved/",
     "save_period": 5,
     "verbosity": 2,
@@ -107,7 +119,7 @@
     "early_stop": 100,
     "visualize": "wandb",
     "wandb_project": "ss_project",
-    "len_epoch": 100,
-    "grad_norm_clip": 10
+    "len_epoch": 1500,
+    "grad_norm_clip": 100
   }
 }
