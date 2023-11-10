@@ -56,7 +56,7 @@
               "nfiles": 10000,
               "test": true,
               "path": "/kaggle/input/librispeech-mix/test-clean-mix/kaggle/working/mixer",
-              "snr_levels": [-5, 5],
+              "snr_levels": [0, 0],
               "num_workers": 2,
               "vad_db": 20,
               "audio_len": 3

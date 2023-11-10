@@ -217,7 +217,10 @@ class SpEx(nn.Module):
         m_mask = self.middle_mask(new_x)
         l_mask = self.long_mask(new_x)
 
+        
         s_s = self.decoder_short(s_mask * enc_short)
+        decoder_len = s_s.shape[-1]
+        s_s = F.pad(s_s, (0, short_len - decoder_len))
         s_m = self.decoder_middle(m_mask * enc_middle)[:, :, :short_len]
         s_l = self.decoder_long(l_mask * enc_long)[:, :, :short_len]
         ### SPEAKER EXTRACTOR ###

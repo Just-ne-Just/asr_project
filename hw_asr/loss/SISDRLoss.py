@@ -23,7 +23,7 @@ class SISDRLoss(nn.Module):
         sisdr_loss = (1 - self.alpha - self.beta) * sisdr_short.sum() + self.alpha * sisdr_middle.sum() + self.beta * sisdr_long.sum()
         sisdr_loss = -sisdr_loss.mean()
 
-        if train:
+        if not train:
             return sisdr_loss
         ce_loss = F.cross_entropy(logits, speaker_ids)
         return sisdr_loss + self.gamma * ce_loss
