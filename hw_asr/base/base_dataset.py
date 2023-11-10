@@ -70,7 +70,6 @@ class BaseDataset(Dataset):
         return audio_tensor
     
     def _count_speakers(self):
-        print(self._index)
         return max(map(lambda x: x["speaker_id"], self._index)) + 1
 
     @staticmethod
