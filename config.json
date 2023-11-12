@@ -32,7 +32,7 @@
             "mixer_config": {
               "nfiles": 10000,
               "test": false,
-              "path": "/kaggle/input/librispeech-mixed/librispeech-mixed",
+              "path": "/kaggle/input/ss-dataset-no-wad",
               "snr_levels": [-5, 5],
               "num_workers": 2,
               "trim_db": 20,
@@ -55,13 +55,13 @@
             "mixer_config": {
               "nfiles": 10000,
               "test": true,
-              "path": "/kaggle/input/librispeech-mixed/librispeech-mixed",
+              "path": "/kaggle/input/ss-dataset-no-wad",
               "snr_levels": [0, 0],
               "num_workers": 2,
               "vad_db": 20,
               "audio_len": 3
             },
-            "part": "test-clean",
+            "part": "dev-clean",
             "data_dir": "/kaggle/input/librispeech/test-clean/LibriSpeech"
           }
         }
