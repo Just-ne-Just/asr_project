@@ -63,9 +63,9 @@ def main(config, out_file):
             
             for metric in metrics:
                 evaluation_metrics.update(metric.name, metric(**batch))
-            
+    
     with Path(out_file).open("w") as f:
-        json.dump(evaluation_metrics.result(), f, indent=2)
+        json.dump(str(evaluation_metrics.result()), f, indent=2)
 
 
 if __name__ == "__main__":
