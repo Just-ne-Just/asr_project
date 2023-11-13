@@ -149,9 +149,9 @@ if __name__ == "__main__":
                     {
                         "type": "CustomDirTripletDataset",
                         "args": {
-                            "mix": str(test_data_folder / "mix"),
-                            "ref": str(test_data_folder / "refs"),
-                            "target": str(test_data_folder / "targets")
+                            "mix_path": str(test_data_folder / "mix"),
+                            "ref_path": str(test_data_folder / "refs"),
+                            "target_path": str(test_data_folder / "targets")
                         },
                     }
                 ],
