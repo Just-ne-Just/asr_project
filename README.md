@@ -1,4 +1,4 @@
-# ASR project barebones
+# SS project
 ## Автор
 Семаков Андрей Игоревич
 ## Лицензия
@@ -9,25 +9,16 @@
 pip install -r ./requirements.txt - версии указал, по идее, все должно заработать
 ```
 ```
-Веса asr модели можно скачать с помощью git lfs pull. Самые крутые веса лежат в saved/models/default_config/success_360_512_aug/model_best.pth
-```
-```
-Веса lm модели можно скачать тут https://www.kaggle.com/datasets/leonbebra/lm-model
+Веса asr модели можно скачать отсюда https://www.kaggle.com/datasets/tomasbebra/ss-checkpoint/data
 ```
 ```
 Запуск train: python train.py -c <путь до конфига> -r <путь до чекпоинта>
-Желательно перед этим прописать в config.py корректные пути до датасетов и поставить в конфиге text_encoder.lm = False и убрать из конфига LMWERMetric, LMCERMetric
 ```
 ```
-Запуск test: python test.py -c <путь до конфига, где есть data.test> -r <путь до чекпоинта> -b <число, размер батча> -o <имя выходного файла> -t <путь до кастомного тестового датасета (лучше не использовать)> -j <количество потоков>
-Метрики считаются сами и выписани в самом низу выходного файла (под всеми предсказаниями)
-```
-## LM model weights
-```
-https://www.kaggle.com/datasets/leonbebra/lm-model
+Запуск test: python test.py -c <путь до конфига, где есть data.test> -r <путь до чекпоинта> -b <число, размер батча> -o <имя выходного файла> -t <путь до кастомного тестового датасета> -j <количество потоков>
 ```
 ## Описание проекта
-ASR английской речи
+SS английской речи
 
 ## Структура репозитория
 ```
