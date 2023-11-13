@@ -41,6 +41,8 @@ class BaseDataset(Dataset):
         ref_path = data_dict["ref_path"]
         target_path = data_dict["target_path"]
 
+        print(data_dict)
+
 
         mix_wave = self.load_audio(mix_path)
         ref_wave = self.load_audio(ref_path)
