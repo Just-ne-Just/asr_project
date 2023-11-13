@@ -29,7 +29,7 @@ def main(config, out_file):
     dataloaders = get_dataloaders(config)
 
     # build model architecture
-    model = config.init_obj(config["arch"], module_model)
+    model = config.init_obj(config["arch"], module_model, n_speakers=251)
     logger.info(model)
 
     logger.info("Loading checkpoint: {} ...".format(config.resume))
