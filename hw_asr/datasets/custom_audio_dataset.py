@@ -12,9 +12,9 @@ class CustomAudioDataset(BaseDataset):
     def __init__(self, data, *args, **kwargs):
         index = data
         for entry in data:
+            print(entry)
             entry["mix_path"] = str(Path(entry["mix_path"]).absolute().resolve())
             entry["ref_path"] = str(Path(entry["ref_path"]).absolute().resolve())
             entry["target_path"] = str(Path(entry["target_path"]).absolute().resolve())
-        print(entry)
 
         super().__init__(index, *args, **kwargs)
