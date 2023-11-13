@@ -18,7 +18,7 @@ class PESQMetric(BaseMetric):
         targets = targets.squeeze(1)
         short = short.squeeze(1)
         try:
-            metric = self.pesq(audio_norm(short), targets).mean()
+            metric = self.pesq(audio_norm(short), targets).mean().item()
         except Exception as e:
             metric = 0
         return metric
