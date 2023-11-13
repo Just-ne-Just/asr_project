@@ -147,7 +147,7 @@ if __name__ == "__main__":
                 "num_workers": args.jobs,
                 "datasets": [
                     {
-                        "type": "СustomDirTripletDataset",
+                        "type": "CustomDirTripletDataset",
                         "args": {
                             "mix": str(test_data_folder / "mix"),
                             "ref": str(test_data_folder / "refs"),
