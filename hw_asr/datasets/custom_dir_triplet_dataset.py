@@ -20,7 +20,8 @@ class CustomDirTripletDataset(CustomAudioDataset):
                 "mix_path": f"{mix_path}/{mix_path_}",
                 "ref_path": f"{ref_path}/{ref_path_}",
                 "target_path": f"{target_path}/{target_path_}",
-                "speaker_id": -1
+                "speaker_id": -1,
+                "name": "",
             })
         
         super().__init__(data, *args, **kwargs)
