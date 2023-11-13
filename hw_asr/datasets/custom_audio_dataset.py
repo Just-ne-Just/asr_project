@@ -13,7 +13,7 @@ class CustomAudioDataset(BaseDataset):
         index = data
         for entry in data:
             entry["mix_path"] = str(Path(entry["mix_path"]).absolute().resolve())
-            entry["reference_path"] = str(Path(entry["reference_path"]).absolute().resolve())
+            entry["ref_path"] = str(Path(entry["ref_path"]).absolute().resolve())
             entry["target_path"] = str(Path(entry["target_path"]).absolute().resolve())
 
         super().__init__(index, *args, **kwargs)
