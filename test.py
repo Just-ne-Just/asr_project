@@ -7,9 +7,12 @@ import torch
 from tqdm import tqdm
 
 import hw_asr.model as module_model
+import hw_asr.metric as module_metric
+
 from hw_asr.trainer import Trainer
 from hw_asr.utils import ROOT_PATH
 from hw_asr.utils.object_loading import get_dataloaders
+from hw_asr.utils import MetricTracker
 from hw_asr.utils.parse_config import ConfigParser
 from hw_asr.metric.utils import calc_cer, calc_wer
 
@@ -22,14 +25,11 @@ def main(config, out_file):
     # define cpu or gpu if possible
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # text_encoder
-    text_encoder = config.get_text_encoder()
-
     # setup data_loader instances
     dataloaders = get_dataloaders(config, text_encoder)
 
     # build model architecture
-    model = config.init_obj(config["arch"], module_model, n_class=len(text_encoder))
+    model = config.init_obj(config["arch"], module_model)
     logger.info(model)
 
     logger.info("Loading checkpoint: {} ...".format(config.resume))
@@ -45,16 +45,14 @@ def main(config, out_file):
     model.eval()
 
     results = []
+    metrics = []
+    for metric in config["metrics"]:
+        metrics.append(config.init_obj(metric, module_metric))
 
     with torch.no_grad():
-        all_lm_wer = []
-        all_lm_cer = []
-
-        all_argmax_wer = []
-        all_argmax_cer = []
-
-        all_beam_wer = []
-        all_beam_cer = []
+        evaluation_metrics = MetricTracker(
+            *[metric.name for metric in metrics]
+        )
         for batch_num, batch in enumerate(tqdm(dataloaders["test"])):
             batch = Trainer.move_batch_to_device(batch, device)
             output = model(**batch)
@@ -62,63 +60,12 @@ def main(config, out_file):
                 batch.update(output)
             else:
                 batch["logits"] = output
-            batch["log_probs"] = torch.log_softmax(batch["logits"], dim=-1)
-            batch["log_probs_length"] = model.transform_input_lengths(
-                batch["spectrogram_length"]
-            )
-            batch["probs"] = batch["log_probs"].exp().cpu()
-            batch["argmax"] = batch["probs"].argmax(-1)
-            all_hypos = text_encoder.ctc_lm(batch["probs"], batch["log_probs_length"], beam_size=15)
-            for i in range(len(batch["text"])):
-                lm_wer = calc_wer(batch["text"][i], all_hypos[i]) * 100
-                all_lm_wer.append(lm_wer)
-                lm_cer = calc_cer(batch["text"][i], all_hypos[i]) * 100
-                all_lm_cer.append(lm_cer)
-
-                argmax = batch["argmax"][i]
-                argmax = argmax[: int(batch["log_probs_length"][i])]
-                argmax_pred = text_encoder.ctc_decode(argmax.cpu().numpy())
-                argmax_wer = calc_wer(batch["text"][i], argmax_pred) * 100
-                all_argmax_wer.append(argmax_wer)
-                argmax_cer = calc_cer(batch["text"][i], argmax_pred) * 100
-                all_argmax_cer.append(argmax_cer)
-
-                beam_search_pred = text_encoder.ctc_beam_search(
-                            batch["probs"][i], batch["log_probs_length"][i], beam_size=3
-                        )[0].text
-                beam_wer = calc_wer(batch["text"][i], beam_search_pred) * 100
-                all_beam_wer.append(beam_wer)
-                beam_cer = calc_cer(batch["text"][i], beam_search_pred) * 100
-                all_beam_cer.append(beam_cer)
-                
-
-                results.append(
-                    {
-                        "ground_trurh": batch["text"][i],
-                        "pred_text_argmax": argmax_pred,
-                        "argmar_wer": argmax_wer,
-                        "argmar_cer": argmax_cer,
-                        "pred_text_beam_search": beam_search_pred,
-                        "beam_wer": beam_wer,
-                        "beam_cer": beam_cer,
-                        "pred_lm": all_hypos[i],
-                        "lm_wer": lm_wer,
-                        "lm_cer": lm_cer
-                    }
-                )
-        results.append(
-            {
-                "GLOBAL LM WER": sum(all_lm_wer) / len(all_lm_wer),
-                "GLOBAL LM CER": sum(all_lm_cer) / len(all_lm_cer),
-                "GLOBAL ARGMAX WER": sum(all_argmax_wer) / len(all_argmax_wer),
-                "GLOBAL ARGMAX CER": sum(all_argmax_cer) / len(all_argmax_cer),
-                "GLOBAL BEAM WER": sum(all_beam_wer) / len(all_beam_wer),
-                "GLOBAL BEAM CER": sum(all_beam_cer) / len(all_beam_cer),
-            }
-        )
+            
+            for metric in metrics:
+                evaluation_metrics.update(metric.name, metric(**batch))
             
     with Path(out_file).open("w") as f:
-        json.dump(results, f, indent=2)
+        json.dump(evaluation_metrics.result(), f, indent=2)
 
 
 if __name__ == "__main__":
@@ -200,12 +147,11 @@ if __name__ == "__main__":
                 "num_workers": args.jobs,
                 "datasets": [
                     {
-                        "type": "CustomDirAudioDataset",
+                        "type": "СustomDirTripletDataset",
                         "args": {
-                            "audio_dir": str(test_data_folder / "audio"),
-                            "transcription_dir": str(
-                                test_data_folder / "transcriptions"
-                            ),
+                            "mix": str(test_data_folder / "mix"),
+                            "ref": str(test_data_folder / "refs"),
+                            "target": str(test_data_folder / "targets")
                         },
                     }
                 ],
