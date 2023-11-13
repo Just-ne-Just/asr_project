@@ -8,18 +8,18 @@ logger = logging.getLogger(__name__)
 
 
 class CustomDirTripletDataset(CustomAudioDataset):
-    def __init__(self, mix, ref, target, *args, **kwargs):
+    def __init__(self, mix_path, ref_path, target_path, *args, **kwargs):
         data = []
 
-        mix_paths = sorted(os.listdir(mix))
-        ref_paths = sorted(os.listdir(ref))
-        target_paths = sorted(os.listdir(target))
+        mix_paths = sorted(os.listdir(mix_path))
+        ref_paths = sorted(os.listdir(ref_path))
+        target_paths = sorted(os.listdir(target_path))
 
-        for mix_path, ref_path, target_path in zip(mix_paths, ref_paths, target_paths):
+        for mix_path_, ref_path_, target_path_ in zip(mix_paths, ref_paths, target_paths):
             data.append({
-                "mix": f"{mix}/{mix_path}",
-                "reference": f"{ref}/{ref_path}",
-                "target": f"{target}/{target_path}",
+                "mix": f"{mix_path_}/{mix_path}",
+                "reference": f"{ref_path_}/{ref_path}",
+                "target": f"{target_path_}/{target_path}",
                 "speaker_id": -1
             })
         
