@@ -17,9 +17,9 @@ class CustomDirTripletDataset(CustomAudioDataset):
 
         for mix_path_, ref_path_, target_path_ in zip(mix_paths, ref_paths, target_paths):
             data.append({
-                "mix": f"{mix_path_}/{mix_path}",
-                "reference": f"{ref_path_}/{ref_path}",
-                "target": f"{target_path_}/{target_path}",
+                "mix_path": f"{mix_path_}/{mix_path}",
+                "reference_path": f"{ref_path_}/{ref_path}",
+                "target_path": f"{target_path_}/{target_path}",
                 "speaker_id": -1
             })
         
