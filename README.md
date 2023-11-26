@@ -19,7 +19,7 @@ pip install -r ./requirements.txt - версии указал, по идее, в
 Желательно перед этим прописать в config.py корректные пути до датасетов и поставить в конфиге text_encoder.lm = False и убрать из конфига LMWERMetric, LMCERMetric
 ```
 ```
-Запуск test: python test.py -c <путь до конфига, где есть data.test> -r <путь до чекпоинта> -b <число, размер батча> -o <имя выходного файла> -t <путь до кастомного тестового датасета (лучше не использовать)> -j <количество потоков>
+python download.py && python test.py -c config.json -r ./saved/models/default_config/success_360_512_aug/model_best.pth -b 32
 Метрики считаются сами и выписани в самом низу выходного файла (под всеми предсказаниями)
 ```
 ## LM model weights
