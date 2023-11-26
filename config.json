@@ -14,8 +14,8 @@
     "type": "CTCCharTextEncoder",
     "args": {
       "lm": true,
-      "model_path": "kenlm/3-gram.arpa",
-      "vocab_path": "kenlm/librispeech-vocab.txt"
+      "model_path": "3-gram.arpa",
+      "vocab_path": "librispeech-vocab.txt"
     }
   },
   "augmentations": {
@@ -23,14 +23,6 @@
       {
         "type": "Gain",
         "args": {
-          "sample_rate": 16000,
-          "p": 0.1
-        }
-      },
-      {
-        "type": "AddBackgroundNoise",
-        "args": {
-          "background_paths": "noise",
           "sample_rate": 16000,
           "p": 0.1
         }
@@ -74,85 +66,6 @@
     }
   },
   "data": {
-    "train": {
-      "batch_size": 32,
-      "num_workers": 0,
-      "datasets": [
-        {
-          "type": "LibrispeechDataset",
-          "args": {
-            "part": "train-clean-100",
-            "max_audio_length": 20.0,
-            "max_text_length": 200,
-            "data_dir": "/home/jupyter/mnt/datasets/LibriSpeech/LibriSpeech"
-          }
-        },
-        {
-          "type": "LibrispeechDataset",
-          "args": {
-            "part": "train-clean-360",
-            "max_audio_length": 20.0,
-            "max_text_length": 200,
-            "data_dir": "/home/jupyter/mnt/datasets/LibriSpeech/LibriSpeech"
-          }
-        },
-        {
-          "type": "LibrispeechDataset",
-          "args": {
-            "part": "train-other-500",
-            "max_audio_length": 20.0,
-            "max_text_length": 200,
-            "data_dir": "/home/jupyter/mnt/datasets/LibriSpeech/LibriSpeech"
-          }
-        }
-      ]
-    },
-    "val": {
-      "batch_size": 32,
-      "num_workers": 0,
-      "datasets": [
-        {
-          "type": "LibrispeechDataset",
-          "args": {
-            "part": "dev-clean",
-            "data_dir": "/home/jupyter/mnt/datasets/LibriSpeech/LibriSpeech"
-          }
-        },
-        {
-          "type": "LibrispeechDataset",
-          "args": {
-            "part": "dev-other",
-            "data_dir": "/home/jupyter/mnt/datasets/LibriSpeech/LibriSpeech"
-          }
-        }
-      ]
-    },
-    "test-clean": {
-      "batch_size": 32,
-      "num_workers": 0,
-      "datasets": [
-        {
-          "type": "LibrispeechDataset",
-          "args": {
-            "part": "test-clean",
-            "data_dir": "/home/jupyter/mnt/datasets/LibriSpeech/LibriSpeech"
-          }
-        }
-      ]
-    },
-    "test-other": {
-      "batch_size": 32,
-      "num_workers": 0,
-      "datasets": [
-        {
-          "type": "LibrispeechDataset",
-          "args": {
-            "part": "test-other",
-            "data_dir": "/home/jupyter/mnt/datasets/LibriSpeech/LibriSpeech"
-          }
-        }
-      ]
-    },
     "test": {
       "batch_size": 32,
       "num_workers": 0,
@@ -160,8 +73,7 @@
         {
           "type": "LibrispeechDataset",
           "args": {
-            "part": "test",
-            "data_dir": "/home/jupyter/mnt/datasets/LibriSpeech/LibriSpeech"
+            "part": "dev-clean"
           }
         }
       ]
