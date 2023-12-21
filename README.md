@@ -15,7 +15,8 @@ pip install -r ./requirements.txt - версии указал, по идее, в
 Запуск train: python train.py -c <путь до конфига> -r <путь до чекпоинта>
 ```
 ```
-Запуск test: python test.py -c <путь до конфига, где есть data.test> -r <путь до чекпоинта> -b <число, размер батча> -o <имя выходного файла> -t <путь до кастомного тестового датасета> -j <количество потоков>
+Запуск test:
+python download.py && python test.py -c config.json -r model_best.pth -t <absolute path to custom dataset> -b 32
 ```
 ## Описание проекта
 SS английской речи
