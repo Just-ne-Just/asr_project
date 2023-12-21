@@ -16,3 +16,4 @@ Pillow==9.5.0
 pyloudnorm
 pesq
 https://github.com/kpu/kenlm/archive/master.zip
+torchmetrics
